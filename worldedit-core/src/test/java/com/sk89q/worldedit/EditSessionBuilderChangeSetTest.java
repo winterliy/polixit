@@ -22,9 +22,11 @@ package com.sk89q.worldedit;
 import com.sk89q.worldedit.history.changeset.ArrayListHistory;
 import com.sk89q.worldedit.history.changeset.BlockOptimizedHistory;
 import com.sk89q.worldedit.history.changeset.ChangeSet;
+import com.sk89q.worldedit.extension.platform.Actor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.Mockito.mock;
 
 class EditSessionBuilderChangeSetTest extends BaseWorldEditTest {
 
@@ -42,6 +44,15 @@ class EditSessionBuilderChangeSetTest extends BaseWorldEditTest {
                 .changeSet(changeSet)
                 .build()) {
             assertSame(changeSet, session.getChangeSet());
+        }
+    }
+
+    @Test
+    void localSessionCanCreateAnEditSessionWithCustomHistory() {
+        ChangeSet changeSet = new ArrayListHistory();
+        Actor actor = mock(Actor.class);
+        try (EditSession editSession = new LocalSession().createEditSession(actor, changeSet)) {
+            assertSame(changeSet, editSession.getChangeSet());
         }
     }
 }
