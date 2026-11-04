@@ -1,8 +1,27 @@
 <h1>
-    <img src="worldedit-logo.svg" alt="WorldEdit" width="400" /> 
+    <img src="worldedit-logo.svg" alt="Polixit" width="400" />
 </h1>
 
-**A Minecraft Map Editor... that runs in-game!**
+**Polixit combines WorldEdit's in-game map editing with Motopoly-style terrain generation.**
+
+This fork targets **GLAP1 / Paper 26.3 with Java 25**. Install the Polixit plugin jar in the server's `plugins` folder and remove the standalone WorldEdit jar; Polixit replaces it.
+
+### Terrain commands
+
+* `//gen [y]` generates terrain in the current WorldEdit cuboid selection. Omit `y` to use the selection's vertical range, or provide a height for a flat target.
+* `//terrain info` analyzes the terrain surrounding the selection.
+* `//terrain config` shows your terrain settings. Use `//terrain config <distance|round|rough|step> [value]` to change a setting; omit the value to restore the server default. Player settings are saved per UUID.
+* Formula-based generation remains available as `//generate` and `//g`.
+
+`//pos1`, `//pos2`, WorldEdit's wand, selections, undo, and redo continue to work as usual.
+
+The integrated Motopoly terrain code retains its MIT notice in `worldedit-bukkit/src/main/resources/MOTOPOLY-LICENSE.txt`. WorldEdit remains licensed under GPLv3.
+
+This repository contains the Polixit source code. Follow [COMPILING.md](COMPILING.md) to build it; the Bukkit distribution artifact is `worldedit-bukkit/build/libs/polixit-7.4.7.jar` for a release build.
+
+---
+
+The upstream WorldEdit project is **a Minecraft map editor that runs in-game**:
 
 * With selections, schematics, copy and paste, brushes, and scripting!
 * Use it in creative, survival in single player or on your server.

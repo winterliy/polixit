@@ -1,3 +1,10 @@
+7.4.7
+- Polixit fork for GLAP1 / Paper 26.3 and Java 25
+- Integrated Motopoly terrain generation into the Bukkit plugin
+- Added `//terrain info` and per-player `//terrain config` settings
+- Assigned `//gen [y]` to terrain generation; formula generation remains at `//generate` and `//g`
+- Retained WorldEdit undo/redo history for terrain edits
+
 7.4.6
 - Update to Minecraft 26.3
 - Improve parsing of complex NBT in certain situations
