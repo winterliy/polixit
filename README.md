@@ -17,7 +17,7 @@ This fork targets **GLAP1 / Paper 26.3 with Java 25**. Install the Polixit plugi
 
 The integrated Motopoly terrain code retains its MIT notice in `worldedit-bukkit/src/main/resources/MOTOPOLY-LICENSE.txt`. WorldEdit remains licensed under GPLv3.
 
-This repository contains the Polixit source code. Follow [COMPILING.md](COMPILING.md) to build it; the Bukkit distribution artifact is `worldedit-bukkit/build/libs/polixit-7.4.7.jar` for a release build.
+This repository contains the Polixit source code. Follow [COMPILING.md](COMPILING.md) to build it; the Bukkit distribution artifact is `worldedit-bukkit/build/libs/polixit-0.1.0-dist.jar` for the first release.
 
 ---
 
