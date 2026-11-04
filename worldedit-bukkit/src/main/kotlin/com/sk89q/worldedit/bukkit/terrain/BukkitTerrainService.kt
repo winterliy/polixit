@@ -48,6 +48,7 @@ class BukkitTerrainService(private val plugin: WorldEditPlugin) : TerrainService
         if (!file.exists()) plugin.saveResource("terrain.yml", false)
         Settings.load(YamlConfiguration.loadConfiguration(file))
     }
+    private val optionsStore: TerrainOptionsStore by lazy { TerrainOptionsStore(plugin, settings) }
 
     override fun generate(actor: Actor, session: LocalSession, region: Region, level: Int?) {
         val regionWorld = region.world
@@ -84,7 +85,8 @@ class BukkitTerrainService(private val plugin: WorldEditPlugin) : TerrainService
             return
         }
 
-        val margin = config.defaultDistance + config.analysisMargin
+        val options = optionsStore.load(actor)
+        val margin = options.distance + config.analysisMargin
         val originX = min.x() - margin
         val originZ = min.z() - margin
         val gridWidth = width + margin * 2
@@ -103,8 +105,8 @@ class BukkitTerrainService(private val plugin: WorldEditPlugin) : TerrainService
                 null
             }
             val params = GenerateParams(
-                lowY, highY, config.defaultRough, config.scale, config.defaultDistance,
-                2, config.maxStep, seed, minHeight, maxHeight - 1, config.defaultRound,
+                lowY, highY, options.rough, config.scale, options.distance,
+                2, options.step, seed, minHeight, maxHeight - 1, options.round,
             )
             Generation.design(
                 grid, vanilla, params, config.maxFillDepth, config.copyPlants,
@@ -122,6 +124,101 @@ class BukkitTerrainService(private val plugin: WorldEditPlugin) : TerrainService
                 }
             })
         }
+    }
+
+    override fun showInfo(actor: Actor, region: Region) {
+        val regionWorld = region.world
+        if (regionWorld == null || region !is CuboidRegion) {
+            actor.printError(TextComponent.of("Terrain analysis requires a cuboid selection in a loaded world."))
+            return
+        }
+        val world = try {
+            BukkitAdapter.adapt(regionWorld)
+        } catch (e: RuntimeException) {
+            actor.printError(TextComponent.of("The selected world is not loaded."))
+            return
+        }
+        val min = region.minimumPoint
+        val max = region.maximumPoint
+        val margin = settings.analysisMargin.coerceAtLeast(1)
+        actor.printInfo(TextComponent.of("Analyzing surrounding terrain..."))
+        SurfaceScanner.scan(world, min.x(), min.z(), max.x(), max.z(), margin, ForkJoinPool.commonPool())
+            .whenComplete { grid, failure ->
+                Bukkit.getScheduler().runTask(plugin, Runnable {
+                    if (failure != null) {
+                        actor.printError(TextComponent.of("Terrain analysis failed: ${failure.message ?: "unknown error"}"))
+                    } else {
+                        val stats = TerrainStats.ofBand(grid.heights, grid.width, grid.depth, grid.margin)
+                        actor.printInfo(TextComponent.of(
+                            "Surroundings: ${stats.describe()}, Y ${stats.min()}–${stats.max()}, " +
+                                "median ${stats.median()}, roughness ${"%.2f".format(stats.roughness())}; " +
+                                "selection Y ${min.y()}–${max.y()}."
+                        ))
+                    }
+                })
+            }
+    }
+
+    override fun configure(actor: Actor, setting: String?, value: String?) {
+        val options = optionsStore.load(actor)
+        if (setting == null) {
+            printOptions(actor, options)
+            return
+        }
+        val defaults = optionsStore.defaultOptions()
+        val updated = when (setting.lowercase()) {
+            "distance" -> {
+                val parsed = value?.toIntOrNull()
+                if (value == null) options.copy(distance = defaults.distance)
+                else if (parsed == null || parsed !in 0..64) {
+                    actor.printError(TextComponent.of("distance must be an integer from 0 to 64."))
+                    return
+                } else options.copy(distance = parsed)
+            }
+            "round" -> {
+                val parsed = value?.toIntOrNull()
+                if (value == null) options.copy(round = defaults.round)
+                else if (parsed == null || parsed !in 0..100) {
+                    actor.printError(TextComponent.of("round must be an integer from 0 to 100."))
+                    return
+                } else options.copy(round = parsed)
+            }
+            "rough" -> {
+                if (value == null) options.copy(rough = defaults.rough)
+                else {
+                    val parsed = Settings.parseRough(value)
+                    if (parsed == null || (!parsed.isNaN() && parsed > 16.0)) {
+                        actor.printError(TextComponent.of("rough must be auto or a number from 0 to 16."))
+                        return
+                    }
+                    options.copy(rough = parsed)
+                }
+            }
+            "step" -> {
+                val parsed = value?.toDoubleOrNull()
+                if (value == null) options.copy(step = defaults.step)
+                else if (parsed == null || parsed !in 0.0..16.0) {
+                    actor.printError(TextComponent.of("step must be a number from 0 to 16."))
+                    return
+                } else options.copy(step = parsed)
+            }
+            else -> {
+                actor.printError(TextComponent.of("Setting must be distance, round, rough, or step."))
+                return
+            }
+        }
+        if (!optionsStore.save(actor, updated)) {
+            actor.printError(TextComponent.of("Per-player terrain settings require a player."))
+            return
+        }
+        printOptions(actor, updated)
+    }
+
+    private fun printOptions(actor: Actor, options: TerrainOptions) {
+        val rough = if (options.rough.isNaN()) "auto" else options.rough.toString()
+        actor.printInfo(TextComponent.of(
+            "Terrain settings: distance ${options.distance}, round ${options.round}, rough $rough, step ${options.step}."
+        ))
     }
 
     private fun apply(actor: Actor, session: LocalSession, world: World, generation: Generation) {

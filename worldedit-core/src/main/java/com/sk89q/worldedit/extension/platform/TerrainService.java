@@ -36,4 +36,16 @@ public interface TerrainService {
      * @param level optional fixed surface Y; null uses the selection corner heights
      */
     void generate(Actor actor, LocalSession session, Region region, @Nullable Integer level);
+
+    /** Display terrain analysis for a WorldEdit selection. */
+    void showInfo(Actor actor, Region region);
+
+    /**
+     * Show or update the actor's terrain-generation options.
+     *
+     * @param actor the actor requesting the change
+     * @param setting option name, or null to display all options
+     * @param value new value, or null to restore the configured default
+     */
+    void configure(Actor actor, @Nullable String setting, @Nullable String value);
 }
