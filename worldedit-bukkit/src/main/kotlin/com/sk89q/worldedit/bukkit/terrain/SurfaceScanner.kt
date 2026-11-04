@@ -27,6 +27,7 @@ import org.bukkit.World
 import org.bukkit.block.data.BlockData
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executor
+import java.util.UUID
 
 /**
  * Surface heights over a region plus [margin] columns on each side, read from
@@ -39,6 +40,9 @@ class SurfaceGrid(
     val width: Int,
     val depth: Int,
     val margin: Int,
+    val minHeight: Int,
+    val maxHeight: Int,
+    val worldId: UUID,
     /** Y of the topmost terrain block (trees, plants and water skipped). */
     val heights: IntArray,
     /** Like [heights], but stops at the water surface: what a newcomer's ground should meet. */
@@ -101,6 +105,9 @@ object SurfaceScanner {
         val minZ = selectionMinZ - margin
         val maxX = selectionMaxX + margin
         val maxZ = selectionMaxZ + margin
+        val minHeight = world.minHeight
+        val maxHeight = world.maxHeight
+        val worldId = world.uid
 
         val futures = ArrayList<CompletableFuture<ChunkSnapshot>>()
         for (cx in (minX shr 4)..(maxX shr 4)) {
@@ -112,12 +119,13 @@ object SurfaceScanner {
 
         return CompletableFuture.allOf(*futures.toTypedArray()).thenApplyAsync({
             val snapshots = futures.associate { f -> f.join().let { chunkKey(it.x, it.z) to it } }
-            build(world, minX, minZ, maxX, maxZ, margin, snapshots)
+            build(world, minX, minZ, maxX, maxZ, margin, minHeight, maxHeight, worldId, snapshots)
         }, async)
     }
 
     private fun build(
         world: World, minX: Int, minZ: Int, maxX: Int, maxZ: Int, margin: Int,
+        minHeight: Int, maxHeight: Int, worldId: UUID,
         snapshots: Map<Long, ChunkSnapshot>,
     ): SurfaceGrid {
         val width = maxX - minX + 1
@@ -125,14 +133,14 @@ object SurfaceScanner {
         val heights = IntArray(width * depth)
         val surface = IntArray(width * depth)
         val sky = IntArray(width * depth)
-        val floor = world.minHeight
+        val floor = minHeight
 
         for (z in minZ..maxZ) {
             for (x in minX..maxX) {
                 val snap = snapshots.getValue(chunkKey(x shr 4, z shr 4))
                 val lx = x and 15
                 val lz = z and 15
-                val top = topNonAir(snap, lx, lz, world)
+                val top = topNonAir(snap, lx, lz, minHeight, maxHeight)
                 var y = top
                 var water = Int.MIN_VALUE
                 while (y > floor) {
@@ -152,18 +160,21 @@ object SurfaceScanner {
                 sky[i] = maxOf(top, y)
             }
         }
-        return SurfaceGrid(world, minX, minZ, width, depth, margin, heights, surface, sky, snapshots)
+        return SurfaceGrid(
+            world, minX, minZ, width, depth, margin, minHeight, maxHeight, worldId,
+            heights, surface, sky, snapshots,
+        )
     }
 
     /** Highest non-air block in a column, skipping empty sections; the heightmap misses torches, glass panes and the like. */
-    private fun topNonAir(snap: ChunkSnapshot, lx: Int, lz: Int, world: World): Int {
-        val minSection = world.minHeight shr 4
-        for (section in ((world.maxHeight - 1) shr 4) downTo minSection) {
+    private fun topNonAir(snap: ChunkSnapshot, lx: Int, lz: Int, minHeight: Int, maxHeight: Int): Int {
+        val minSection = minHeight shr 4
+        for (section in ((maxHeight - 1) shr 4) downTo minSection) {
             if (snap.isSectionEmpty(section - minSection)) continue
             for (y in (section shl 4) + 15 downTo (section shl 4)) {
                 if (!snap.getBlockType(lx, y, lz).isAir) return y
             }
         }
-        return world.minHeight
+        return minHeight
     }
 }

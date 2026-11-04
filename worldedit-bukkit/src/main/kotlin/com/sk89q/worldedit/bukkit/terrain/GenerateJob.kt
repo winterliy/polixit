@@ -96,14 +96,14 @@ object GenerateJob {
         vanilla: VanillaColumns?, copyPlants: Boolean,
         waterLevel: Int?, beachWidth: Int, seed: Long, fillOres: Boolean,
     ): TerrainChanges {
-        val changes = TerrainChanges(grid.world.uid)
+        val changes = TerrainChanges(grid.worldId)
         val m = grid.margin
         val band = plan.band()
         val w = grid.width - 2 * m
         val d = grid.depth - 2 * m
         val bw = w + 2 * band
-        val floor = grid.world.minHeight
-        val ceiling = grid.world.maxHeight - 1
+        val floor = grid.minHeight
+        val ceiling = grid.maxHeight - 1
         val profiles = HashMap<Int, ColumnProfile>()
         val toWater = waterLevel?.let { distanceToWater(grid, plan, it) }
         val seabed = waterLevel?.let { Seabed(grid, seed) { x, y, z -> floorProfile(grid, x, y, z) } }
@@ -247,7 +247,7 @@ object GenerateJob {
 
     /** Grass, flowers, ferns, snow layers… sitting on the terrain (at most two blocks, e.g. tall grass). */
     private fun plantsAbove(grid: SurfaceGrid, x: Int, surface: Int, z: Int): List<BlockData> {
-        val ceiling = grid.world.maxHeight - 1
+        val ceiling = grid.maxHeight - 1
         val plants = ArrayList<BlockData>(2)
         for (y in surface + 1..minOf(surface + 2, ceiling)) {
             val type = grid.type(x, y, z)
@@ -265,7 +265,7 @@ object GenerateJob {
 
     /** Null when the column has no ground to copy at [surface] (e.g. water opening into a cave). */
     private fun profileOf(grid: SurfaceGrid, x: Int, surface: Int, z: Int): ColumnProfile? {
-        val floor = grid.world.minHeight
+        val floor = grid.minHeight
         return stackProfile { d -> if (surface - d >= floor) grid.blockData(x, surface - d, z) else null }
     }
 
