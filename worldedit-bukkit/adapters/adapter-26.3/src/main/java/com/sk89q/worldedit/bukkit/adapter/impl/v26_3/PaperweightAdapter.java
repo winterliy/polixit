@@ -33,6 +33,7 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.bukkit.terrain.VanillaColumns;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extension.platform.Watchdog;
@@ -73,6 +74,7 @@ import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import io.papermc.paper.world.PaperWorldLoader;
 import io.papermc.paper.world.saveddata.PaperWorldPDC;
+import org.bukkit.World;
 import net.minecraft.SharedConstants;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -231,6 +233,12 @@ public final class PaperweightAdapter implements BukkitImplAdapter {
             It is recommended to use a version of WorldEdit that supports your Minecraft version.
             For more information, see https://worldedit.enginehub.org/en/latest/faq/#bukkit-adapters
             """;
+
+    @Override
+    @Nullable
+    public VanillaColumns sampleVanillaTerrain(World world, int originX, int originZ, int width, int depth) {
+        return PaperVanillaTerrainSampler.INSTANCE.sample(world, originX, originZ, width, depth);
+    }
 
     // ------------------------------------------------------------------------
     // Code that may break between versions of Minecraft

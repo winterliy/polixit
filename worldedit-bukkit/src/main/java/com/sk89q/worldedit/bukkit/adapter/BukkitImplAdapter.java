@@ -21,6 +21,7 @@ package com.sk89q.worldedit.bukkit.adapter;
 
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
+import com.sk89q.worldedit.bukkit.terrain.VanillaColumns;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -344,5 +345,20 @@ public interface BukkitImplAdapter {
      * @param chunks a list of chunk coordinates to send biome updates for
      */
     default void sendBiomeUpdates(World world, Iterable<BlockVector2> chunks) {
+    }
+
+    /**
+     * Sample the vanilla generator's terrain without changing the loaded world.
+     *
+     * @param world the world whose generator should be sampled
+     * @param originX minimum X coordinate
+     * @param originZ minimum Z coordinate
+     * @param width number of columns in X
+     * @param depth number of columns in Z
+     * @return sampled columns, or null when this adapter cannot provide them
+     */
+    @Nullable
+    default VanillaColumns sampleVanillaTerrain(World world, int originX, int originZ, int width, int depth) {
+        return null;
     }
 }
