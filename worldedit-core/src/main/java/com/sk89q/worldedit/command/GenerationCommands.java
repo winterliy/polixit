@@ -28,6 +28,8 @@ import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.Logging;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.extension.platform.Capability;
+import com.sk89q.worldedit.extension.platform.TerrainService;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.annotation.Radii;
 import com.sk89q.worldedit.internal.annotation.Selection;
@@ -348,7 +350,7 @@ public class GenerationCommands {
 
     @Command(
         name = "/generate",
-        aliases = { "/gen", "/g" },
+        aliases = { "/g" },
         desc = "Generates a shape according to a formula.",
         descFooter = "For details, see https://ehub.to/we/expr"
     )
@@ -381,6 +383,26 @@ public class GenerationCommands {
             actor.printError(TextComponent.of(e.getMessage()));
             return 0;
         }
+    }
+
+    @Command(
+        name = "/gen",
+        desc = "Generates new terrain inside the selected region."
+    )
+    @CommandPermissions("worldedit.generation.terrain")
+    @Logging(ALL)
+    public int terrain(Actor actor, LocalSession session,
+                       @Selection Region region,
+                       @Arg(desc = "Fixed surface Y; omitted uses the selection corner heights", def = "")
+                           Integer level) {
+        TerrainService terrainService = worldEdit.getPlatformManager()
+            .queryCapability(Capability.WORLD_EDITING).getTerrainService();
+        if (terrainService == null) {
+            actor.printError(TextComponent.of("Terrain generation is not supported by this platform."));
+            return 0;
+        }
+        terrainService.generate(actor, session, region, level);
+        return 1;
     }
 
     @Command(

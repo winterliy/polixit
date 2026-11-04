@@ -66,6 +66,7 @@ dependencies {
     )
 
     "testRuntimeOnly"(libs.log4j.core)
+    "testImplementation"(libs.piston.coreAp.annotations)
 }
 
 tasks.test {
