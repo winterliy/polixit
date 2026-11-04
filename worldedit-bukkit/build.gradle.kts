@@ -1,9 +1,17 @@
 import buildlogic.internalVersion
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import io.papermc.paperweight.userdev.attribute.Obfuscation
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id("buildlogic.platform")
+    kotlin("jvm") version "2.4.20"
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_25
+    }
 }
 
 platform {
@@ -69,12 +77,8 @@ dependencies {
     "implementation"(libs.bstats.bukkit)
     "implementation"(libs.fastutil)
 
-    project.project(":worldedit-bukkit:adapters").subprojects.forEach {
-        "adaptersScope"(project(it.path))
-    }
-    listOf("1.21.4", "1.21.5", "1.21.6", "1.21.9", "1.21.11").forEach {
-        "adaptersReobfScope"(project(":worldedit-bukkit:adapters:adapter-$it"))
-    }
+    // Polixit targets GLAP1/Paper 26.3 only; do not ship or reobfuscate legacy adapters.
+    "adaptersScope"(project(":worldedit-bukkit:adapters:adapter-26.3"))
 }
 
 tasks.named<Copy>("processResources") {
@@ -94,6 +98,7 @@ val shadeReobfAdapters = tasks.register<ShadowJar>("shadeReobfAdapters") {
 }
 
 tasks.named<ShadowJar>("shadowJar") {
+    archiveBaseName.set("polixit")
     from(zipTree(shadeReobfAdapters.map { it.archiveFile }))
     configurations.add(project.configurations.named("runtimeClasspath"))
     configurations.add(adapters.get())
@@ -141,3 +146,4 @@ configure<PublishingExtension> {
         from(components["java"])
     }
 }
+

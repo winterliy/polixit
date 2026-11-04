@@ -46,14 +46,15 @@
 **Files:**
 - Modify: `worldedit-bukkit/src/main/resources/plugin.yml`
 - Modify: `worldedit-bukkit/build.gradle.kts`
-- Modify: `worldedit-bukkit/adapters/adapter-26.3/build.gradle.kts` and adapter module conventions as required
-- Modify: `gradle/libs.versions.toml`
+- Modify: root `gradle.properties` only if the existing target release differs from Java 25
+- Modify: `worldedit-bukkit/build.gradle.kts` to apply Kotlin only in the Bukkit artifact and name the published artifact Polixit
 - Modify: plugin entrypoint metadata and Polixit documentation
+- Test: `worldedit-bukkit/src/test/java/com/sk89q/worldedit/bukkit/PolixitPluginMetadataTest.java`
 
-- [ ] Add a build assertion for the intended plugin identity, API version 26.3, and Java 25 runtime metadata.
+- [ ] Add a JUnit assertion for the intended plugin identity, API version 26.3, Kotlin runtime, and Java 25 class-file target.
 - [ ] Rename plugin display identity to Polixit, set api-version 26.3, add Kotlin runtime loading as needed, and keep the Bukkit main class.
-- [ ] Apply the Kotlin JVM plugin only to the Bukkit deliverable; configure Java/Kotlin bytecode for Java 25 without raising unrelated platform modules.
-- [ ] Add a `:worldedit-bukkit:assemble` verification task expectation and inspect generated plugin metadata.
+- [ ] Apply the Kotlin JVM plugin only to the Bukkit deliverable; confirm the existing root Java release is 25 and keep unrelated platform modules unchanged.
+- [ ] Run `:worldedit-bukkit:test :worldedit-bukkit:assemble` and inspect the generated plugin metadata and adapter contents.
 
 ### Task 3: Port Motopoly terrain model and algorithms
 
