@@ -1,24 +1,22 @@
 {
     "schemaVersion": 1,
-    "id": "worldedit",
+    "id": "polixit",
     "version": "${version}",
 
-    "name": "WorldEdit",
-    "description": "WorldEdit is an easy-to-use in-game world editor for Minecraft, supporting both single- and multi-player.",
+    "name": "Polixit",
+    "description": "Polixit terrain generation and WorldEdit editing tools for Minecraft.",
     "authors": [
         {
             "name": "EngineHub",
             "contact": {
-                "homepage": "https://enginehub.org/",
-                "discord": "https://discord.gg/enginehub"
+                "homepage": "https://github.com/winterliy/polixit"
             }
         }
     ],
     "contact": {
-        "homepage": "https://enginehub.org/worldedit/",
-        "sources": "https://github.com/EngineHub/WorldEdit",
-        "issues": "https://github.com/EngineHub/WorldEdit/issues",
-        "discord": "https://discord.gg/enginehub"
+        "homepage": "https://github.com/winterliy/polixit",
+        "sources": "https://github.com/winterliy/polixit",
+        "issues": "https://github.com/winterliy/polixit/issues"
     },
     "custom": {
         "modmenu": {

@@ -65,7 +65,7 @@ dependencies {
 }
 
 configure<BasePluginExtension> {
-    archivesName.set("${project.name}-mc${libs.fabric.minecraft.get().version}")
+    archivesName.set("polixit-fabric-mc${libs.fabric.minecraft.get().version}")
 }
 
 configure<PublishingExtension> {
@@ -76,6 +76,7 @@ configure<PublishingExtension> {
 }
 
 tasks.named<Copy>("processResources") {
+    from("../worldedit-bukkit/src/main/resources/MOTOPOLY-LICENSE.txt")
     // Avoid carrying project reference into task execution
     val internalVersion = project.internalVersion
     // this will ensure that this task is redone when the versions change.

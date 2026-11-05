@@ -70,8 +70,8 @@ public class FabricWorldEdit extends CoreMcMod implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        this.container = FabricLoader.getInstance().getModContainer("worldedit").orElseThrow(
-            () -> new IllegalStateException("WorldEdit mod missing in Fabric")
+        this.container = FabricLoader.getInstance().getModContainer("polixit").orElseThrow(
+            () -> new IllegalStateException("Polixit mod missing in Fabric")
         );
 
         PLATFORM = new FabricPlatform(this);
@@ -79,12 +79,21 @@ public class FabricWorldEdit extends CoreMcMod implements ModInitializer {
 
         CUIPacketHandler.instance().registerServerboundHandler(this::onCuiPacket);
 
-        ServerTickEvents.END_SERVER_TICK.register(server -> ThreadSafeCache.getInstance().onEndTick(server));
+        ServerTickEvents.END_SERVER_TICK.register(server -> {
+            ThreadSafeCache.getInstance().onEndTick(server);
+            ((FabricPlatform) PLATFORM).getTerrainServiceImpl().tick(server);
+        });
         CommandRegistrationCallback.EVENT.register((dispatcher, _, _) -> registerCommands(dispatcher));
         ServerLifecycleEvents.SERVER_STARTING.register(_ -> serverAboutToStart());
         ServerLifecycleEvents.SERVER_STARTED.register(this::serverStarted);
-        ServerLifecycleEvents.SERVER_STOPPING.register(_ -> serverStopping());
-        ServerPlayConnectionEvents.DISCONNECT.register((handler, _) -> onPlayerDisconnect(handler.player));
+        ServerLifecycleEvents.SERVER_STOPPING.register(_ -> {
+            ((FabricPlatform) PLATFORM).getTerrainServiceImpl().shutdown();
+            serverStopping();
+        });
+        ServerPlayConnectionEvents.DISCONNECT.register((handler, _) -> {
+            ((FabricPlatform) PLATFORM).getTerrainServiceImpl().onPlayerDisconnect(handler.player);
+            onPlayerDisconnect(handler.player);
+        });
         AttackBlockCallback.EVENT.register(
             (playerEntity, _, hand, blockPos, direction) ->
                 onLeftClickBlock(playerEntity, hand, blockPos, direction)
@@ -102,7 +111,7 @@ public class FabricWorldEdit extends CoreMcMod implements ModInitializer {
             }
             return InteractionResult.PASS;
         });
-        LOGGER.info("WorldEdit for Fabric (version " + getInternalVersion() + ") is loaded");
+        LOGGER.info("Polixit for Fabric (version " + getInternalVersion() + ") is loaded");
     }
 
     @Override

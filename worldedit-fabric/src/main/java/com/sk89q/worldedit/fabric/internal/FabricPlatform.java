@@ -21,6 +21,8 @@ package com.sk89q.worldedit.fabric.internal;
 
 import com.sk89q.worldedit.coremc.internal.CoreMcPlatform;
 import com.sk89q.worldedit.fabric.FabricAdapter;
+import com.sk89q.worldedit.fabric.terrain.FabricTerrainService;
+import com.sk89q.worldedit.extension.platform.TerrainService;
 import com.sk89q.worldedit.util.lifecycle.Lifecycled;
 import com.sk89q.worldedit.util.lifecycle.SimpleLifecycled;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -31,6 +33,8 @@ import org.enginehub.worldeditcui.protocol.CUIPacket;
 
 class FabricPlatform extends CoreMcPlatform {
 
+    private final FabricTerrainService terrainService;
+
     private static Lifecycled<MinecraftServer> createMinecraftServerLifecycled() {
         SimpleLifecycled<MinecraftServer> lifecycledServer = SimpleLifecycled.invalid();
         ServerLifecycleEvents.SERVER_STARTING.register(lifecycledServer::newValue);
@@ -40,6 +44,16 @@ class FabricPlatform extends CoreMcPlatform {
 
     FabricPlatform(FabricWorldEdit mod) {
         super(mod, createMinecraftServerLifecycled());
+        this.terrainService = new FabricTerrainService(this);
+    }
+
+    @Override
+    public TerrainService getTerrainService() {
+        return terrainService;
+    }
+
+    FabricTerrainService getTerrainServiceImpl() {
+        return terrainService;
     }
 
     @Override
