@@ -20,9 +20,9 @@
 
 package com.sk89q.worldedit.bukkit.terrain
 
-import com.sk89q.worldedit.bukkit.terrain.GenerateParams
-import com.sk89q.worldedit.bukkit.terrain.GeneratePlan
-import com.sk89q.worldedit.bukkit.terrain.TerrainGenerator
+import com.sk89q.worldedit.terrain.GenerateParams
+import com.sk89q.worldedit.terrain.GeneratePlan
+import com.sk89q.worldedit.terrain.TerrainGenerator
 
 /** Everything one /mt gen run decided, ready to apply. */
 data class Generation(

@@ -20,7 +20,7 @@
 
 package com.sk89q.worldedit.bukkit.terrain
 
-import com.sk89q.worldedit.bukkit.terrain.OctaveNoise
+import com.sk89q.worldedit.terrain.OctaveNoise
 import org.bukkit.Material
 import org.bukkit.Tag
 import org.bukkit.block.BlockFace

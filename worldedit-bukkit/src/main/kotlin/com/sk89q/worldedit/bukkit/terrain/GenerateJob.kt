@@ -20,9 +20,9 @@
 
 package com.sk89q.worldedit.bukkit.terrain
 
-import com.sk89q.worldedit.bukkit.terrain.GeneratePlan
-import com.sk89q.worldedit.bukkit.terrain.OctaveNoise
-import com.sk89q.worldedit.bukkit.terrain.OreTable
+import com.sk89q.worldedit.terrain.GeneratePlan
+import com.sk89q.worldedit.terrain.OctaveNoise
+import com.sk89q.worldedit.terrain.OreTable
 import org.bukkit.Material
 import org.bukkit.block.data.BlockData
 import org.bukkit.block.data.Snowable

@@ -18,9 +18,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit.bukkit.terrain;
+package com.sk89q.worldedit.terrain;
 
-import com.sk89q.worldedit.bukkit.terrain.OreTable.Ore;
+import com.sk89q.worldedit.terrain.OreTable.Ore;
 import org.junit.jupiter.api.Test;
 
 import java.util.EnumMap;

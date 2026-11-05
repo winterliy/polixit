@@ -18,7 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit.bukkit.terrain;
+package com.sk89q.worldedit.terrain;
 
 import java.util.Arrays;
 
