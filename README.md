@@ -21,6 +21,20 @@ The integrated Motopoly terrain code retains its MIT notice in `worldedit-bukkit
 
 This repository contains the Polixit source code. Follow [COMPILING.md](COMPILING.md) to build it. Release artifacts: `worldedit-bukkit/build/libs/polixit-0.2.0-dist.jar` and `worldedit-fabric/build/libs/polixit-fabric-mc26.3-0.2.0-dist.jar`.
 
+### 진행 상황 및 남은 검증 (2026-11-06)
+
+- Fabric 26.3 서버에서 Polixit 0.2.0 로드, 명령 등록, 격리 테스트 월드 생성 및 테스트 플레이어 로그인을 확인했습니다.
+- Fabric·core·Paper Gradle 테스트와 두 플랫폼 배포 jar 빌드는 통과했습니다.
+- 실제 `//pos1`, `//pos2`, `//gen`, `//undo`, `//redo` 순서는 아직 검증되지 않았습니다. 임시 테스트 클라이언트의 26.3 registry/known-pack 동기화가 실패해 플레이어 조작 검증을 완료하지 못했습니다. v0.2.0 릴리스는 이미 게시돼 있습니다.
+
+**내일(2026-11-07) 검증 계획**
+
+1. 테스트용 Fabric 26.3 클라이언트로 격리 서버 `worldedit-fabric/run`에 접속합니다. 실제 클라이언트를 사용해 protocol 777 및 registry 동기화를 거칩니다.
+2. 스폰 근처의 작은 cuboid를 좌표 인자로 선택하고 `//terrain info`로 로드된 영역인지 확인합니다.
+3. `//gen 80`을 실행해 완료 메시지와 지형 변경을 확인합니다.
+4. `//undo` 후 원래 블록이 복원됐는지, `//redo` 후 생성 지형이 다시 적용됐는지 확인합니다.
+5. 서버 로그에서 명령 처리 오류를 확인합니다. 실패가 있으면 수정·검증 후 커밋, 푸시하고 v0.2.0 릴리스 jar를 갱신합니다. 통과하면 검증 결과를 이 README에 기록하고 커밋·푸시합니다.
+
 ---
 
 The upstream WorldEdit project is **a Minecraft map editor that runs in-game**:
