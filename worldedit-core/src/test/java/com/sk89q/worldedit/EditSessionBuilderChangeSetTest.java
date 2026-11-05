@@ -23,6 +23,7 @@ import com.sk89q.worldedit.history.changeset.ArrayListHistory;
 import com.sk89q.worldedit.history.changeset.BlockOptimizedHistory;
 import com.sk89q.worldedit.history.changeset.ChangeSet;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.world.World;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -33,6 +34,15 @@ class EditSessionBuilderChangeSetTest extends BaseWorldEditTest {
     @Test
     void builtSessionKeepsTheDefaultHistoryWhenNoneWasProvided() {
         try (EditSession session = WorldEdit.getInstance().newEditSessionBuilder().build()) {
+            org.junit.jupiter.api.Assertions.assertInstanceOf(BlockOptimizedHistory.class, session.getChangeSet());
+        }
+    }
+
+    @Test
+    void worldBackedSessionUsesItsDefaultHistoryExtent() {
+        try (EditSession session = WorldEdit.getInstance().newEditSessionBuilder()
+                .world(mock(World.class))
+                .build()) {
             org.junit.jupiter.api.Assertions.assertInstanceOf(BlockOptimizedHistory.class, session.getChangeSet());
         }
     }

@@ -297,7 +297,7 @@ public class EditSession implements Extent, AutoCloseable {
             this.bypassHistory = traceIfNeeded(new DataValidatorExtent(extent, world));
 
             // These extents can be skipped by calling smartSetBlock()
-            extent = traceIfNeeded(changeSetExtent = new ChangeSetExtent(extent, changeSet));
+            extent = traceIfNeeded(changeSetExtent = new ChangeSetExtent(extent, this.changeSet));
             extent = traceIfNeeded(maskingExtent = new MaskingExtent(extent, Masks.alwaysTrue()));
             extent = traceIfNeeded(changeLimiter = new BlockChangeLimiter(extent, maxBlocks));
             extent = wrapExtent(extent, eventBus, event, Stage.BEFORE_HISTORY);
