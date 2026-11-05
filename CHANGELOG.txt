@@ -1,3 +1,9 @@
+Polixit 0.2.0 (based on WorldEdit 7.4.7)
+- Added a Fabric 26.3 mod distribution with terrain commands and per-player settings
+- Shared terrain planning algorithms between Bukkit and Fabric
+- Added Fabric terrain undo/redo history and bounded tick-based block application
+- Renamed the Fabric mod id and display name to Polixit
+
 Polixit 0.1.1 (based on WorldEdit 7.4.7)
 - `//pos1 [x] [y] [z]` and `//pos2 [x] [y] [z]` accept separate optional coordinates
 - Fixed default change history for world-backed edit sessions, restoring terrain undo/redo

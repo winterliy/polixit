@@ -37,16 +37,12 @@ public record FabricTerrainOptions(int distance, int round, double rough, double
         if (!Files.exists(file)) return DEFAULT;
         Properties values = new Properties();
         try (Reader reader = Files.newBufferedReader(file)) { values.load(reader); }
-        try {
-            return new FabricTerrainOptions(
-                Integer.parseInt(values.getProperty("distance", "10")),
-                Integer.parseInt(values.getProperty("round", "0")),
-                parseRough(values.getProperty("rough", "auto")),
-                Double.parseDouble(values.getProperty("step", "1.0"))
-            );
-        } catch (RuntimeException ignored) {
-            return DEFAULT;
-        }
+        return new FabricTerrainOptions(
+            Integer.parseInt(values.getProperty("distance", "10")),
+            Integer.parseInt(values.getProperty("round", "0")),
+            parseRough(values.getProperty("rough", "auto")),
+            Double.parseDouble(values.getProperty("step", "1.0"))
+        );
     }
 
     public void save(Path configDir, UUID playerId) throws IOException {

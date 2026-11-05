@@ -4,7 +4,9 @@
 
 **Polixit combines WorldEdit's in-game map editing with Motopoly-style terrain generation.**
 
-This fork targets **GLAP1 / Paper 26.3 with Java 25**. Install the Polixit plugin jar in the server's `plugins` folder and remove the standalone WorldEdit jar; Polixit replaces it.
+Polixit supports **GLAP1 / Paper 26.3** and **Fabric 26.3** with Java 25. Install the Paper plugin jar in the server's `plugins` folder, or install the Fabric mod jar in the `mods` folder. Remove any separate WorldEdit jar; Polixit replaces it on either platform.
+
+Fabric distribution: `worldedit-fabric/build/libs/polixit-fabric-mc26.3-0.2.0-dist.jar`. The Fabric mod id is `polixit`; existing WorldEdit Fabric installations should remove the old jar. Fabric terrain generation uses captured native surface heights and procedural shaping, so it does not include Paper's vanilla terrain sampler.
 
 ### Terrain commands
 
@@ -17,7 +19,7 @@ This fork targets **GLAP1 / Paper 26.3 with Java 25**. Install the Polixit plugi
 
 The integrated Motopoly terrain code retains its MIT notice in `worldedit-bukkit/src/main/resources/MOTOPOLY-LICENSE.txt`. WorldEdit remains licensed under GPLv3.
 
-This repository contains the Polixit source code. Follow [COMPILING.md](COMPILING.md) to build it; the latest Bukkit distribution artifact is `worldedit-bukkit/build/libs/polixit-0.1.1-dist.jar`.
+This repository contains the Polixit source code. Follow [COMPILING.md](COMPILING.md) to build it. Release artifacts: `worldedit-bukkit/build/libs/polixit-0.2.0-dist.jar` and `worldedit-fabric/build/libs/polixit-fabric-mc26.3-0.2.0-dist.jar`.
 
 ---
 

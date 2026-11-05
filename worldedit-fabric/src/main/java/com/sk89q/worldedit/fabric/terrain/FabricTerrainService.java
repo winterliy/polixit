@@ -81,7 +81,7 @@ public final class FabricTerrainService implements TerrainService {
             error(actor, "Requested surface height is outside this world's build range."); return;
         }
         FabricTerrainOptions options = options(actor);
-        int margin = Math.min(options.distance(), 32) + ANALYSIS_MARGIN;
+        int margin = options.distance() + ANALYSIS_MARGIN;
         if ((selected.width + margin * 2L) * (selected.depth + margin * 2L) > MAX_COLUMNS) {
             error(actor, "Selection and analysis area exceed the Fabric terrain limit of " + MAX_COLUMNS + " columns."); return;
         }
@@ -101,14 +101,12 @@ public final class FabricTerrainService implements TerrainService {
             GeneratePlan plan = TerrainGenerator.plan(heights, gridW, gridD, margin, originX, originZ, params);
             return makeChanges(selected, plan, originX, originZ, heights, gridW);
         }, ForkJoinPool.commonPool());
-        CompletableFuture<List<BlockChange>> completion = planning.whenComplete((changes, failure) -> {
+        CompletableFuture<List<BlockChange>> completion = planning.handle((changes, failure) -> {
             if (failure != null) pending.add(Pending.failure(actor, failure));
             else pending.add(new Pending(actor, session, selected.editWorld, changes, null));
+            return changes;
         });
-        completion.exceptionally(failure -> {
-            pending.add(Pending.failure(actor, failure));
-            return null;
-        });
+        completion.exceptionally(failure -> null);
     }
 
     private List<BlockChange> makeChanges(Selection selection, GeneratePlan plan,
@@ -117,8 +115,6 @@ public final class FabricTerrainService implements TerrainService {
         int bandW = selection.width + plan.band() * 2;
         int bandD = selection.depth + plan.band() * 2;
         if ((long) bandW * bandD > MAX_COLUMNS) throw new IllegalArgumentException("Terrain plan exceeds the safe output limit.");
-        int minY = selection.min.y();
-        int maxY = selection.max.y();
         BlockState air = FabricAdapter.get().fromNativeBlockState(Blocks.AIR.defaultBlockState());
         BlockState surface = FabricAdapter.get().fromNativeBlockState(Blocks.GRASS_BLOCK.defaultBlockState());
         BlockState dirt = FabricAdapter.get().fromNativeBlockState(Blocks.DIRT.defaultBlockState());
@@ -131,7 +127,9 @@ public final class FabricTerrainService implements TerrainService {
             int targetY = plan.target()[z * bandW + x];
             int sourceY = heights[(wz - originZ) * gridW + wx - originX];
 
-            int boundedTargetY = Math.max(minY, Math.min(maxY, targetY));
+            // The explicit /gen [y] argument is independent of the selection's vertical bounds.
+            // TerrainGenerator already clamps target heights to the world's build range.
+            int boundedTargetY = targetY;
             if (boundedTargetY == sourceY) continue;
             for (int y = Math.min(boundedTargetY, sourceY) + 1; y <= Math.max(boundedTargetY, sourceY); y++) {
                 if (y < selection.world.getMinY() || y >= selection.world.getMaxY()) continue;
@@ -203,7 +201,7 @@ public final class FabricTerrainService implements TerrainService {
     }
 
     private Selection validate(Actor actor, @Nullable LocalSession session, Region region) {
-        if (!(region instanceof CuboidRegion) || !(region.getWorld() instanceof CoreMcWorld world)) {
+        if (!(region instanceof CuboidRegion cuboid) || !(region.getWorld() instanceof CoreMcWorld world)) {
             error(actor, "Terrain operation requires a cuboid selection in a loaded world."); return null;
         }
         BlockVector3 min = region.getMinimumPoint(), max = region.getMaximumPoint();
@@ -218,7 +216,7 @@ public final class FabricTerrainService implements TerrainService {
         if (!(editWorld instanceof CoreMcWorld editCoreWorld) || editCoreWorld.getWorld() != nativeWorld) {
             error(actor, "The selected world is not available to the Fabric editing platform."); return null;
         }
-        int margin = ANALYSIS_MARGIN + (session == null ? 0 : Math.min(options(actor).distance(), 32));
+        int margin = ANALYSIS_MARGIN + (session == null ? 0 : options(actor).distance());
         int scanMinX = min.x() - margin, scanMaxX = max.x() + margin;
         int scanMinZ = min.z() - margin, scanMaxZ = max.z() + margin;
         if (scanMinX < -30_000_000 || scanMaxX > 30_000_000 || scanMinZ < -30_000_000 || scanMaxZ > 30_000_000) {
@@ -227,7 +225,7 @@ public final class FabricTerrainService implements TerrainService {
         for (int cx = scanMinX >> 4; cx <= scanMaxX >> 4; cx++)
             for (int cz = scanMinZ >> 4; cz <= scanMaxZ >> 4; cz++)
                 if (!nativeWorld.getChunkSource().hasChunk(cx, cz)) { error(actor, "Terrain operation only scans already loaded chunks."); return null; }
-        return new Selection(world, nativeWorld, editCoreWorld, min, max, width, depth);
+        return new Selection(cuboid, world, nativeWorld, editWorld, min, max, width, depth);
     }
 
     private int[] captureHeights(ServerLevel world, int x0, int z0, int width, int depth) {
@@ -243,16 +241,19 @@ public final class FabricTerrainService implements TerrainService {
 
     /** Drain a bounded batch on the Fabric server thread. */
     public void tick(MinecraftServer server) {
-        Pending job = pending.peek();
-        if (job == null) return;
-        if (job.failure != null) { pending.poll(); error(job.actor, "Terrain planning failed: " + rootMessage(job.failure)); return; }
-        if (job.session == null) { pending.poll(); return; }
+        Pending job = active.peek();
+        if (job == null) {
+            job = pending.peek();
+            if (job == null) return;
+            if (job.failure != null) { pending.poll(); error(job.actor, "Terrain planning failed: " + rootMessage(job.failure)); return; }
+            if (job.session == null) { pending.poll(); return; }
+        }
         if (job.editSession == null) {
-            pending.poll();
+            pending.remove(job);
             job.editSession = job.session.createEditSession(job.actor);
             if (job.editSession.getWorld() == null || !job.editSession.getWorld().equals(job.world)) {
                 error(job.actor, "The active WorldEdit session targets a different world; terrain edits were cancelled.");
-                job.editSession.close(); return;
+                job.editSession.close(); active.remove(job); return;
             }
             job.editSession.setSideEffectApplier(SideEffectSet.none());
             active.add(job);
@@ -308,7 +309,8 @@ public final class FabricTerrainService implements TerrainService {
     private void error(Actor actor, String message) { actor.printError(TextComponent.of(message == null ? "Invalid terrain setting." : message)); }
 
     private record BlockChange(BlockVector3 position, BlockState state) { }
-    private record Selection(CoreMcWorld worldEditWorld, ServerLevel world, com.sk89q.worldedit.world.World editWorld, BlockVector3 min, BlockVector3 max, int width, int depth) { }
+    private record Selection(CuboidRegion region, CoreMcWorld worldEditWorld, ServerLevel world,
+                             com.sk89q.worldedit.world.World editWorld, BlockVector3 min, BlockVector3 max, int width, int depth) { }
     private static final class Pending {
         final Actor actor; final LocalSession session;
         final com.sk89q.worldedit.world.World world;
