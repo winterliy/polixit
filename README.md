@@ -13,11 +13,11 @@ This fork targets **GLAP1 / Paper 26.3 with Java 25**. Install the Polixit plugi
 * `//terrain config` shows your terrain settings. Use `//terrain config <distance|round|rough|step> [value]` to change a setting; omit the value to restore the server default. Player settings are saved per UUID.
 * Formula-based generation remains available as `//generate` and `//g`.
 
-`//pos1`, `//pos2`, WorldEdit's wand, selections, undo, and redo continue to work as usual.
+`//pos1 [x] [y] [z]` and `//pos2 [x] [y] [z]` set selection points from explicit coordinates; omit all coordinates to use the player's current position. WorldEdit's wand, selections, undo, and redo continue to work as usual.
 
 The integrated Motopoly terrain code retains its MIT notice in `worldedit-bukkit/src/main/resources/MOTOPOLY-LICENSE.txt`. WorldEdit remains licensed under GPLv3.
 
-This repository contains the Polixit source code. Follow [COMPILING.md](COMPILING.md) to build it; the Bukkit distribution artifact is `worldedit-bukkit/build/libs/polixit-0.1.0-dist.jar` for the first release.
+This repository contains the Polixit source code. Follow [COMPILING.md](COMPILING.md) to build it; the latest Bukkit distribution artifact is `worldedit-bukkit/build/libs/polixit-0.1.1-dist.jar`.
 
 ---
 
