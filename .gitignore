@@ -29,3 +29,7 @@ worldedit-core/src/main/resources/lang/*
 .archive-unpack/
 commands.rst
 permissions.rst
+
+# documentation kept locally only
+*.md
+README*
