@@ -21,19 +21,22 @@ The integrated Motopoly terrain code retains its MIT notice in `worldedit-bukkit
 
 This repository contains the Polixit source code. Follow [COMPILING.md](COMPILING.md) to build it. Release artifacts: `worldedit-bukkit/build/libs/polixit-0.2.0-dist.jar` and `worldedit-fabric/build/libs/polixit-fabric-mc26.3-0.2.0-dist.jar`.
 
-### 진행 상황 및 남은 검증 (2026-11-06)
+### 검증 결과 (2026-11-08)
 
-- Fabric 26.3 서버에서 Polixit 0.2.0 로드, 명령 등록, 격리 테스트 월드 생성 및 테스트 플레이어 로그인을 확인했습니다.
-- Fabric·core·Paper Gradle 테스트와 두 플랫폼 배포 jar 빌드는 통과했습니다.
-- 실제 `//pos1`, `//pos2`, `//gen`, `//undo`, `//redo` 순서는 아직 검증되지 않았습니다. 임시 테스트 클라이언트의 26.3 registry/known-pack 동기화가 실패해 플레이어 조작 검증을 완료하지 못했습니다. v0.2.0 릴리스는 이미 게시돼 있습니다.
+실제 Fabric 26.3 클라이언트(offline, `PolixitTester`)를 격리 테스트 서버(`worldedit-fabric/run`, 포트 25566 / Paper 26.3 build 218, 포트 25570)에 접속시켜 채팅창에서 직접 명령을 입력해 확인했습니다. 블록 변화는 `clone ... filtered minecraft:air`로 선택 영역의 공기 블록 수를 세어 판정했습니다.
 
-**내일(2026-11-07) 검증 계획**
+| 항목 | Fabric 26.3 | Paper 26.3 |
+|---|---|---|
+| `//pos1`, `//pos2` 좌표 인자 | 통과 | 통과 |
+| `//terrain info` | 통과 | 통과 |
+| `//gen 80` (3000블록 이상, 여러 틱) | 통과: 3680블록 변경 | 통과: 6761블록 변경 |
+| `//undo` 원본 복원 | 통과: 공기 17개 → 601개(원본) | 통과: 공기 0개 → 1302개(원본) |
+| `//redo` 재적용 | 통과: 601개 → 17개 | 통과: 1302개 → 0개 |
+| 서버 로그 오류 | 없음(클라이언트 인증 401 경고만 있음) | 없음 |
 
-1. 테스트용 Fabric 26.3 클라이언트로 격리 서버 `worldedit-fabric/run`에 접속합니다. 실제 클라이언트를 사용해 protocol 777 및 registry 동기화를 거칩니다.
-2. 스폰 근처의 작은 cuboid를 좌표 인자로 선택하고 `//terrain info`로 로드된 영역인지 확인합니다.
-3. `//gen 80`을 실행해 완료 메시지와 지형 변경을 확인합니다.
-4. `//undo` 후 원래 블록이 복원됐는지, `//redo` 후 생성 지형이 다시 적용됐는지 확인합니다.
-5. 서버 로그에서 명령 처리 오류를 확인합니다. 실패가 있으면 수정·검증 후 커밋, 푸시하고 v0.2.0 릴리스 jar를 갱신합니다. 통과하면 검증 결과를 이 README에 기록하고 커밋·푸시합니다.
+- `//terrain config`의 설정 변경 명령은 이번 검증 범위에 포함하지 않았습니다.
+- 선택 영역 안에 플레이어가 있으면 생성된 블록에 끼어 사망합니다. 첫 Fabric 시도에서 확인했습니다. 생성 도중 플레이어를 안전한 위치로 옮기는 처리는 추가하지 않았습니다.
+- 다른 플레이어가 동시에 접속한 상태와 Paper 1.x 이전 버전은 확인하지 않았습니다.
 
 ---
 
