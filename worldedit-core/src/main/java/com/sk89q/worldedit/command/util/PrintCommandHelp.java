@@ -131,7 +131,7 @@ public class PrintCommandHelp {
     private static void printCommands(int page, Stream<Command> commandStream, Actor actor,
                                       List<Command> commandList, String helpRootCommand) throws InvalidComponentException {
         InjectedValueStore store = MapBackedValueStore.create();
-        store.injectValue(Key.of(Actor.class), _ ->
+        store.injectValue(Key.of(Actor.class), ignored ->
             Optional.of(actor));
 
         // Get a list of aliases

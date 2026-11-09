@@ -80,7 +80,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
                 }
                 default -> OptionalInt.empty();
             };
-        } catch (IOException _) {
+        } catch (IOException ignored) {
             return OptionalInt.empty();
         }
     }

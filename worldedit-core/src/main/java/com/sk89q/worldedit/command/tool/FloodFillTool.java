@@ -75,7 +75,7 @@ public class FloodFillTool implements BlockTool {
         try (EditSession editSession = BlockTool.createEditSession(player, session, clicked)) {
             try {
                 recurse(editSession, origin, origin, range, initialType, new HashSet<>());
-            } catch (MaxChangedBlocksException _) {
+            } catch (MaxChangedBlocksException ignored) {
                 player.printError(TranslatableComponent.of("worldedit.tool.max-block-changes"));
             } finally {
                 session.remember(editSession);

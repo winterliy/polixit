@@ -38,7 +38,7 @@ public class PermissionsExResolver extends DinnerPermsResolver {
             }
 
             return new PermissionsExResolver(server, manager);
-        } catch (Throwable _) {
+        } catch (Throwable ignored) {
             return null;
         }
     }

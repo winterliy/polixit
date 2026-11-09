@@ -119,7 +119,7 @@ public class SafeFiles {
         System.gc();
         try {
             Thread.sleep(10);
-        } catch (InterruptedException _) {
+        } catch (InterruptedException ignored) {
             Thread.currentThread().interrupt();
         }
 

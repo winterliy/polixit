@@ -106,7 +106,7 @@ public abstract class BlockBag {
             fetchBlock(blockState);
             storeBlock(blockState);
             return true;
-        } catch (BlockBagException _) {
+        } catch (BlockBagException ignored) {
             return false;
         }
     }

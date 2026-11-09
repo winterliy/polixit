@@ -58,7 +58,7 @@ public class SinglePickaxe implements BlockTool {
         try (EditSession editSession = BlockTool.createEditSession(player, session, clicked)) {
             editSession.getSurvivalExtent().setToolUse(config.superPickaxeDrop);
             editSession.setBlock(blockPoint, BlockTypes.AIR.getDefaultState());
-        } catch (MaxChangedBlocksException _) {
+        } catch (MaxChangedBlocksException ignored) {
             player.printError(TranslatableComponent.of("worldedit.tool.max-block-changes"));
         }
 

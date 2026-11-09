@@ -88,7 +88,7 @@ public class ConvexPolyhedralRegionSelector implements RegionSelector, CUIRegion
             final Region oldRegion;
             try {
                 oldRegion = oldSelector.getRegion();
-            } catch (IncompleteRegionException _) {
+            } catch (IncompleteRegionException ignored) {
                 region = new ConvexPolyhedralRegion(oldSelector.getIncompleteRegion().getWorld());
                 return;
             }

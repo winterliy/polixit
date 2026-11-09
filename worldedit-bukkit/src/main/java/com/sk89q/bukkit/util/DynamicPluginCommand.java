@@ -105,7 +105,7 @@ public class DynamicPluginCommand extends org.bukkit.command.Command implements 
                     }
                 }
                 return false;
-            } catch (Throwable _) {
+            } catch (Throwable ignored) {
                 // If there are errors, we want to just fallback to the super method
             }
         } else if (PermissionsResolverManager.isInitialized() && sender instanceof OfflinePlayer offlinePlayer) {

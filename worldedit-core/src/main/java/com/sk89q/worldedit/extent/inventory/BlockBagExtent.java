@@ -89,9 +89,9 @@ public class BlockBagExtent extends AbstractDelegateExtent {
                 if (!block.getBlockType().getMaterial().isAir()) {
                     try {
                         blockBag.fetchPlacedBlock(block.toImmutableState());
-                    } catch (UnplaceableBlockException _) {
+                    } catch (UnplaceableBlockException ignored) {
                         return false;
-                    } catch (BlockBagException _) {
+                    } catch (BlockBagException ignored) {
                         if (!missingBlocks.containsKey(block.getBlockType())) {
                             missingBlocks.put(block.getBlockType(), 1);
                         } else {
@@ -104,7 +104,7 @@ public class BlockBagExtent extends AbstractDelegateExtent {
                 if (!existing.getBlockType().getMaterial().isAir()) {
                     try {
                         blockBag.storeDroppedBlock(existing);
-                    } catch (BlockBagException _) {
+                    } catch (BlockBagException ignored) {
                         // If we can't store the block, void it
                     }
                 }

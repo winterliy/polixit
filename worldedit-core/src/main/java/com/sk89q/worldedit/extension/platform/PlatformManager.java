@@ -83,7 +83,7 @@ public class PlatformManager {
     private final ImmutableMap<Capability, SimpleLifecycled<Platform>> preferences = Stream.of(Capability.values())
         .collect(Maps.toImmutableEnumMap(
             c -> c,
-            _ -> SimpleLifecycled.invalid()
+            ignored -> SimpleLifecycled.invalid()
         ));
     private @Nullable String firstSeenVersion;
     private final AtomicBoolean initialized = new AtomicBoolean();

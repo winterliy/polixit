@@ -78,7 +78,7 @@ public class DefaultItemParser extends InputParser<BaseItem> {
                 if (itemType != null) {
                     item = new BaseItem(itemType);
                 }
-            } catch (NumberFormatException _) {
+            } catch (NumberFormatException ignored) {
                 // If it doesn't match legacy, just parse it normally
             }
         }

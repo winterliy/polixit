@@ -77,7 +77,7 @@ class BukkitEntity implements Entity {
         org.bukkit.entity.Entity entity = entityRef.get();
         if (entity != null) {
             if (WorldEditPlugin.getInstance().isFolia()) {
-                var _  = entity.teleportAsync(BukkitAdapter.adapt(location));
+                var ignored = entity.teleportAsync(BukkitAdapter.adapt(location));
                 return true;
             } else {
                 return entity.teleport(BukkitAdapter.adapt(location));
@@ -116,7 +116,7 @@ class BukkitEntity implements Entity {
         if (entity != null) {
             try {
                 entity.remove();
-            } catch (UnsupportedOperationException _) {
+            } catch (UnsupportedOperationException ignored) {
                 return false;
             }
             return entity.isDead();

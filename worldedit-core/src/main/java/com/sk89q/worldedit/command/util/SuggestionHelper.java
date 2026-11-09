@@ -132,7 +132,7 @@ public final class SuggestionHelper {
                 try {
                     prop.getValueFor(propVal[1]);
                     matchedProperties.add(prop.name());
-                } catch (IllegalArgumentException _) {
+                } catch (IllegalArgumentException ignored) {
                     return Stream.empty();
                 }
             }

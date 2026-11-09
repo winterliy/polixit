@@ -164,7 +164,7 @@ public final class AsyncCommandBuilder<T> {
      * @param executor the executor to run the task on
      */
     public void buildAndExecNoReturnValue(ListeningExecutorService executor) {
-        var _ = buildAndExec(executor);
+        var ignored = buildAndExec(executor);
     }
 
     @SuppressWarnings("deprecation")
@@ -206,7 +206,7 @@ public final class AsyncCommandBuilder<T> {
                 } else {
                     throw orig;
                 }
-            } catch (Throwable _) {
+            } catch (Throwable ignored) {
                 sender.printError(failure.append(TextComponent.of(": Unknown error. Please see console.")));
                 LOGGER.error("Uncaught exception occurred in task: " + description, orig);
             }

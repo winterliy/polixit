@@ -191,7 +191,7 @@ public class WorldEditCommands {
             ))));
             actor.printInfo(TranslatableComponent.of("worldedit.timezone.current",
                     TextComponent.of(dateFormat.withLocale(actor.getLocale()).format(ZonedDateTime.now(tz)))));
-        } catch (ZoneRulesException _) {
+        } catch (ZoneRulesException ignored) {
             actor.printError(TranslatableComponent.of("worldedit.timezone.invalid"));
         }
     }

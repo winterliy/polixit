@@ -272,7 +272,7 @@ public class SchematicCommands {
         actor.printInfo(TranslatableComponent.of("worldedit.schematic.delete.deleted", TextComponent.of(filename)));
         try {
             LOGGER.info(actor.getName() + " deleted " + f.getCanonicalPath());
-        } catch (IOException _) {
+        } catch (IOException ignored) {
             LOGGER.info(actor.getName() + " deleted " + f.getAbsolutePath());
         }
     }

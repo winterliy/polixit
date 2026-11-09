@@ -100,7 +100,7 @@ public abstract class BaseWorldEditTest {
         });
         when(MOCKED_PLATFORM.getCapabilities()).thenReturn(
                 Stream.of(Capability.values())
-                        .collect(Collectors.toMap(Function.identity(), _ -> Preference.NORMAL))
+                        .collect(Collectors.toMap(Function.identity(), ignored -> Preference.NORMAL))
         );
         when(MOCKED_PLATFORM.getConfiguration()).thenReturn(new LocalConfiguration() {
             @Override

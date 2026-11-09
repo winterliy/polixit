@@ -75,7 +75,7 @@ public abstract class AbstractRegion implements Region {
     public AbstractRegion clone() {
         try {
             return (AbstractRegion) super.clone();
-        } catch (CloneNotSupportedException _) {
+        } catch (CloneNotSupportedException ignored) {
             return null;
         }
     }

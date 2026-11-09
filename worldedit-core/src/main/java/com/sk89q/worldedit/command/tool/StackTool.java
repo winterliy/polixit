@@ -65,7 +65,7 @@ public class StackTool implements BlockTool {
                     }
                     editSession.setBlock(position, block);
                 }
-            } catch (MaxChangedBlocksException _) {
+            } catch (MaxChangedBlocksException ignored) {
                 // Just finish up if we hit max blocks
             } finally {
                 session.remember(editSession);

@@ -228,7 +228,7 @@ public abstract class LocalConfiguration {
                 data = Byte.parseByte(splitter[1]);
             }
             item = LegacyMapper.getInstance().getItemFromLegacy(id, data).id();
-        } catch (Throwable _) {
+        } catch (Throwable ignored) {
             // If we can't parse it, just return it as-is
         }
 

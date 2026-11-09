@@ -246,7 +246,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter {
 
     public PaperweightAdapter() throws NoSuchFieldException, NoSuchMethodException {
         // A simple test
-        var _ = CraftServer.class.cast(Bukkit.getServer());
+        var ignored = CraftServer.class.cast(Bukkit.getServer());
 
         int dataVersion = SharedConstants.getCurrentVersion().dataVersion().version();
         if (dataVersion != Constants.DATA_VERSION_MC_26_3) {
@@ -276,10 +276,10 @@ public final class PaperweightAdapter implements BukkitImplAdapter {
         try {
             Class.forName("org.spigotmc.WatchdogThread");
             watchdog = new SpigotWatchdog();
-        } catch (ClassNotFoundException | NoSuchFieldException _) {
+        } catch (ClassNotFoundException | NoSuchFieldException ignored) {
             try {
                 watchdog = new MojangWatchdog(((CraftServer) Bukkit.getServer()).getServer());
-            } catch (NoSuchFieldException _) {
+            } catch (NoSuchFieldException ignored) {
                 watchdog = null;
             }
         }
@@ -288,7 +288,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter {
         try {
             Class.forName("org.spigotmc.SpigotConfig");
             SpigotConfig.config.set("world-settings.worldeditregentempworld.verbose", false);
-        } catch (ClassNotFoundException _) {
+        } catch (ClassNotFoundException ignored) {
             // It's fine if we couldn't set it
         }
 
@@ -297,7 +297,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter {
             asCraftMirror = MethodHandles.lookup().unreflect(CraftItemStack.class.getMethod(
                 "asCraftMirror", ItemStack.class
             ));
-        } catch (NoSuchMethodException | IllegalAccessException _) {
+        } catch (NoSuchMethodException | IllegalAccessException ignored) {
             // This is purely for Spigot compatibility. It'll fail on Paper.
             asCraftMirror = null;
         }
@@ -308,7 +308,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter {
             fromData = MethodHandles.lookup().unreflect(CraftBlockData.class.getMethod(
                 "fromData", net.minecraft.world.level.block.state.BlockState.class
             ));
-        } catch (NoSuchMethodException | IllegalAccessException _) {
+        } catch (NoSuchMethodException | IllegalAccessException ignored) {
             // This is purely for Spigot compatibility. It'll fail on Paper.
             fromData = null;
         }
@@ -660,9 +660,9 @@ public final class PaperweightAdapter implements BukkitImplAdapter {
         @Override
         public Property<?> load(net.minecraft.world.level.block.state.properties.Property state) {
             return switch (state) {
-                case net.minecraft.world.level.block.state.properties.BooleanProperty _ ->
+                case net.minecraft.world.level.block.state.properties.BooleanProperty ignored ->
                         new BooleanProperty(state.getName(), ImmutableList.copyOf(state.getPossibleValues()));
-                case net.minecraft.world.level.block.state.properties.EnumProperty _ -> {
+                case net.minecraft.world.level.block.state.properties.EnumProperty ignored -> {
                     if (state.getValueClass() == net.minecraft.core.Direction.class) {
                         yield new DirectionalProperty(state.getName(),
                                 (List<Direction>) state.getPossibleValues().stream().map(e -> Direction.valueOf(((StringRepresentable) e).getSerializedName().toUpperCase(Locale.ROOT))).toList());
@@ -670,7 +670,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter {
                     yield new EnumProperty(state.getName(),
                             (List<String>) state.getPossibleValues().stream().map(e -> ((StringRepresentable) e).getSerializedName()).toList());
                 }
-                case net.minecraft.world.level.block.state.properties.IntegerProperty _ ->
+                case net.minecraft.world.level.block.state.properties.IntegerProperty ignored ->
                         new IntegerProperty(state.getName(), ImmutableList.copyOf(state.getPossibleValues()));
                 default ->
                         throw new IllegalArgumentException("WorldEdit needs an update to support " + state.getClass().getSimpleName());
@@ -701,7 +701,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter {
         structureBlock.setLevel(((CraftPlayer) player).getHandle().level());
         ((CraftPlayer) player).getHandle().connection.send(ClientboundBlockEntityDataPacket.create(
                 structureBlock,
-                (_, _) -> (net.minecraft.nbt.CompoundTag) fromNative(nbtData)
+                (ignored1, ignored2) -> (net.minecraft.nbt.CompoundTag) fromNative(nbtData)
         ));
     }
 
@@ -776,7 +776,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter {
         PaperweightFakePlayer fakePlayer;
         try {
             fakePlayer = fakePlayers.get(worldServer);
-        } catch (ExecutionException _) {
+        } catch (ExecutionException ignored) {
             return false;
         }
         fakePlayer.setItemInHand(InteractionHand.MAIN_HAND, stack);
@@ -869,7 +869,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter {
                 @SuppressWarnings("unchecked")
                 Map<String, World> map = (Map<String, World>) serverWorldsField.get(Bukkit.getServer());
                 map.remove("worldeditregentempworld");
-            } catch (IllegalAccessException _) {
+            } catch (IllegalAccessException ignored) {
                 // It's fine if we couldn't remove it
             }
             SafeFiles.tryHardToDeleteDir(tempDir);
@@ -1093,7 +1093,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter {
                     structureRegistry.wrapAsHolder(structure), originalWorld.dimension(), originalWorld.registryAccess(),
                     chunkManager.getGenerator(), chunkManager.getGenerator().getBiomeSource(), climateSampler, chunkManager.randomState(),
                     originalWorld.getStructureTemplateManager(), originalWorld.getSeed(), chunkPos, 0,
-                    proxyLevel.level(), _ -> true
+                    proxyLevel.level(), ignored -> true
             );
 
             if (!structureStart.isValid()) {
@@ -1336,7 +1336,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter {
         public void tick() {
             try {
                 tickField.set(server, Util.getMillis());
-            } catch (IllegalAccessException _) {
+            } catch (IllegalAccessException ignored) {
                 // It's fine if we couldn't set it
             }
         }

@@ -86,9 +86,9 @@ public final class RegistryConverter<V extends Keyed> implements ArgumentConvert
             Field registryField = registryType.getDeclaredField("REGISTRY");
             Registry<V> registry = (Registry<V>) registryField.get(null);
             return new RegistryConverter<>(registry);
-        } catch (NoSuchFieldException _) {
+        } catch (NoSuchFieldException ignored) {
             throw new IllegalArgumentException("Not a registry-backed type: " + registryType.getName());
-        } catch (IllegalAccessException _) {
+        } catch (IllegalAccessException ignored) {
             throw new IllegalStateException("Registry field inaccessible on " + registryType.getName());
         }
     }

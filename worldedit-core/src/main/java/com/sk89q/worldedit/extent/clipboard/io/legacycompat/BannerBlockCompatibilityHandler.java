@@ -41,7 +41,7 @@ public class BannerBlockCompatibilityHandler implements NBTCompatibilityHandler 
         try {
             tempFacing = BlockTypes.WHITE_WALL_BANNER.getProperty("facing");
             tempRotation = BlockTypes.WHITE_BANNER.getProperty("rotation");
-        } catch (NullPointerException | IllegalArgumentException | ClassCastException _) {
+        } catch (NullPointerException | IllegalArgumentException | ClassCastException ignored) {
             tempFacing = null;
             tempRotation = null;
         }

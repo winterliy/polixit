@@ -109,7 +109,7 @@ public class YAMLProcessor extends YAMLNode {
             // 64 MB default
             int yamlCodePointLimit = Integer.getInteger("worldedit.yaml.codePointLimit", 64 * 1024 * 1024);
             loaderOptions.setCodePointLimit(yamlCodePointLimit);
-        } catch (NoSuchMethodError _) {
+        } catch (NoSuchMethodError ignored) {
             // pre-1.32 snakeyaml
         }
 
@@ -155,7 +155,7 @@ public class YAMLProcessor extends YAMLNode {
                 throw new IOException("Stream is null!");
             }
             read(yaml.load(new UnicodeReader(stream)));
-        } catch (YAMLProcessorException _) {
+        } catch (YAMLProcessorException ignored) {
             root = new LinkedHashMap<>();
         }
     }
@@ -256,7 +256,7 @@ public class YAMLProcessor extends YAMLNode {
             } else {
                 root = new LinkedHashMap<>((Map<String, Object>) input);
             }
-        } catch (ClassCastException _) {
+        } catch (ClassCastException ignored) {
             throw new YAMLProcessorException("Root document must be an key-value structure");
         }
     }
@@ -352,7 +352,7 @@ public class YAMLProcessor extends YAMLNode {
     private static class FancyRepresenter extends Representer {
         private FancyRepresenter() {
             super(new DumperOptions());
-            this.nullRepresenter = _ -> representScalar(Tag.NULL, "");
+            this.nullRepresenter = ignored -> representScalar(Tag.NULL, "");
         }
     }
 

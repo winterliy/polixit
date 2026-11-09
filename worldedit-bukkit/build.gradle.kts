@@ -10,7 +10,7 @@ plugins {
 
 kotlin {
     compilerOptions {
-        jvmTarget = JvmTarget.JVM_25
+        jvmTarget = JvmTarget.JVM_21
     }
 }
 
@@ -77,8 +77,8 @@ dependencies {
     "implementation"(libs.bstats.bukkit)
     "implementation"(libs.fastutil)
 
-    // Polixit targets GLAP1/Paper 26.1.2 only; do not ship or reobfuscate legacy adapters.
-    "adaptersScope"(project(":worldedit-bukkit:adapters:adapter-26.1"))
+    // Polixit targets GLAP1/Paper 1.21.11 only; do not ship or reobfuscate legacy adapters.
+    "adaptersScope"(project(":worldedit-bukkit:adapters:adapter-1.21.11"))
 }
 
 tasks.named<Copy>("processResources") {

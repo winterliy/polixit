@@ -76,13 +76,13 @@ class LegacySnapshotCommands {
                 try {
                     WorldEdit.logger.info("WorldEdit found no snapshots: looked in: "
                         + dir.getCanonicalPath());
-                } catch (IOException _) {
+                } catch (IOException ignored) {
                     WorldEdit.logger.info("WorldEdit found no snapshots: looked in "
                         + "(NON-RESOLVABLE PATH - does it exist?): "
                         + dir.getPath());
                 }
             }
-        } catch (MissingWorldException _) {
+        } catch (MissingWorldException ignored) {
             actor.printError(TranslatableComponent.of("worldedit.restore.none-for-world"));
         }
     }
@@ -101,14 +101,14 @@ class LegacySnapshotCommands {
                 } else {
                     actor.printError(TranslatableComponent.of("worldedit.restore.none-found"));
                 }
-            } catch (MissingWorldException _) {
+            } catch (MissingWorldException ignored) {
                 actor.printError(TranslatableComponent.of("worldedit.restore.none-for-world"));
             }
         } else {
             try {
                 session.setSnapshot(config.snapshotRepo.getSnapshot(name));
                 actor.printInfo(TranslatableComponent.of("worldedit.snapshot.use", TextComponent.of(name)));
-            } catch (InvalidSnapshotException _) {
+            } catch (InvalidSnapshotException ignored) {
                 actor.printError(TranslatableComponent.of("worldedit.restore.not-available"));
             }
         }
@@ -135,7 +135,7 @@ class LegacySnapshotCommands {
             }
             session.setSnapshot(snapshot);
             actor.printInfo(TranslatableComponent.of("worldedit.snapshot.use", TextComponent.of(snapshot.getName())));
-        } catch (MissingWorldException _) {
+        } catch (MissingWorldException ignored) {
             actor.printError(TranslatableComponent.of("worldedit.restore.none-for-world"));
         }
     }
@@ -155,7 +155,7 @@ class LegacySnapshotCommands {
                 session.setSnapshot(snapshot);
                 actor.printInfo(TranslatableComponent.of("worldedit.snapshot.use", TextComponent.of(snapshot.getName())));
             }
-        } catch (MissingWorldException _) {
+        } catch (MissingWorldException ignored) {
             actor.printError(TranslatableComponent.of("worldedit.restore.none-for-world"));
         }
     }
@@ -174,7 +174,7 @@ class LegacySnapshotCommands {
                 session.setSnapshot(snapshot);
                 actor.printInfo(TranslatableComponent.of("worldedit.snapshot.use", TextComponent.of(snapshot.getName())));
             }
-        } catch (MissingWorldException _) {
+        } catch (MissingWorldException ignored) {
             actor.printError(TranslatableComponent.of("worldedit.restore.none-for-world"));
         }
     }

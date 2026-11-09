@@ -76,7 +76,7 @@ class BukkitCommandInspector implements CommandInspector {
         Optional<org.enginehub.piston.Command> mapping = dispatcher.getCommand(command.getName());
         if (mapping.isPresent()) {
             InjectedValueStore store = MapBackedValueStore.create();
-            store.injectValue(Key.of(Actor.class), _ ->
+            store.injectValue(Key.of(Actor.class), ignored ->
                 Optional.of(plugin.wrapCommandSender(sender)));
             return mapping.get().getCondition().satisfied(store);
         } else {

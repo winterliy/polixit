@@ -57,7 +57,7 @@ class LegacySnapshotUtilCommands {
         if (snapshotName != null) {
             try {
                 snapshot = config.snapshotRepo.getSnapshot(snapshotName);
-            } catch (InvalidSnapshotException _) {
+            } catch (InvalidSnapshotException ignored) {
                 actor.printError(TranslatableComponent.of("worldedit.restore.not-available"));
                 return;
             }
@@ -79,7 +79,7 @@ class LegacySnapshotUtilCommands {
                     try {
                         WorldEdit.logger.info("WorldEdit found no snapshots: looked in: "
                             + dir.getCanonicalPath());
-                    } catch (IOException _) {
+                    } catch (IOException ignored) {
                         WorldEdit.logger.info("WorldEdit found no snapshots: looked in "
                             + "(NON-RESOLVABLE PATH - does it exist?): "
                             + dir.getPath());
@@ -87,7 +87,7 @@ class LegacySnapshotUtilCommands {
 
                     return;
                 }
-            } catch (MissingWorldException _) {
+            } catch (MissingWorldException ignored) {
                 actor.printError(TranslatableComponent.of("worldedit.restore.none-for-world"));
                 return;
             }

@@ -236,7 +236,7 @@ class BlockMapTest extends BaseWorldEditTest {
         @DisplayName("inserts on computeIfAbsent")
         void insertOnComputeIfAbsent() {
             BlockMap<BaseBlock> map = BlockMap.createForBaseBlock();
-            assertEquals(air, map.computeIfAbsent(BlockVector3.ZERO, _ -> air));
+            assertEquals(air, map.computeIfAbsent(BlockVector3.ZERO, ignored -> air));
             assertEquals(1, map.size());
             assertEquals(air, map.get(BlockVector3.ZERO));
         }
@@ -245,7 +245,7 @@ class BlockMapTest extends BaseWorldEditTest {
         @DisplayName("inserts on compute")
         void insertOnCompute() {
             BlockMap<BaseBlock> map = BlockMap.createForBaseBlock();
-            assertEquals(air, map.compute(BlockVector3.ZERO, (_, _) -> air));
+            assertEquals(air, map.compute(BlockVector3.ZERO, (ignored1, ignored2) -> air));
             assertEquals(1, map.size());
             assertEquals(air, map.get(BlockVector3.ZERO));
         }
@@ -254,7 +254,7 @@ class BlockMapTest extends BaseWorldEditTest {
         @DisplayName("does nothing on computeIfPresent")
         void doesNothingOnComputeIfPresent() {
             BlockMap<BaseBlock> map = BlockMap.createForBaseBlock();
-            assertNull(map.computeIfPresent(BlockVector3.ZERO, (_, _) -> air));
+            assertNull(map.computeIfPresent(BlockVector3.ZERO, (ignored1, ignored2) -> air));
             assertEquals(0, map.size());
         }
 
@@ -477,7 +477,7 @@ class BlockMapTest extends BaseWorldEditTest {
             generator.makeVectorsStream().forEach(vec -> {
                 BlockMap<BaseBlock> map = BlockMap.createForBaseBlock();
                 map.put(vec, air);
-                map.replaceAll((_, _) -> oakWood);
+                map.replaceAll((ignored1, ignored2) -> oakWood);
                 assertEquals(oakWood, map.get(vec));
             });
         }
@@ -663,7 +663,7 @@ class BlockMapTest extends BaseWorldEditTest {
                 }));
                 assertEquals(1, map.size());
                 assertEquals(oakWood, map.get(vec));
-                assertNull(map.compute(vec, (_, _) -> null));
+                assertNull(map.compute(vec, (ignored1, ignored2) -> null));
                 assertEquals(0, map.size());
             });
         }
@@ -684,7 +684,7 @@ class BlockMapTest extends BaseWorldEditTest {
                 assertEquals(2, map.size());
                 assertEquals(air, map.get(vec));
                 assertEquals(oakWood, map.get(nonMatch));
-                assertNull(map.compute(nonMatch, (_, _) -> null));
+                assertNull(map.compute(nonMatch, (ignored1, ignored2) -> null));
                 assertEquals(1, map.size());
                 assertEquals(air, map.get(vec));
             });
@@ -703,7 +703,7 @@ class BlockMapTest extends BaseWorldEditTest {
                 }));
                 assertEquals(1, map.size());
                 assertEquals(oakWood, map.get(vec));
-                assertNull(map.computeIfPresent(vec, (_, _) -> null));
+                assertNull(map.computeIfPresent(vec, (ignored1, ignored2) -> null));
                 assertEquals(0, map.size());
             });
         }

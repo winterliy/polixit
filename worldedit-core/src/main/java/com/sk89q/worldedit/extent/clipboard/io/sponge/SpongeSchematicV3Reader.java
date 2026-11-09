@@ -83,7 +83,7 @@ public class SpongeSchematicV3Reader implements ClipboardReader {
                 return OptionalInt.empty();
             }
             return OptionalInt.of(dataVersion);
-        } catch (IOException _) {
+        } catch (IOException ignored) {
             return OptionalInt.empty();
         }
     }

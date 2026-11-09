@@ -56,7 +56,7 @@ public class BlocksMaskParser extends InputParser<Mask> {
                 return null;
             }
             return new BlockMask(context.requireExtent(), holders);
-        } catch (NoMatchException _) {
+        } catch (NoMatchException ignored) {
             return null;
         }
     }

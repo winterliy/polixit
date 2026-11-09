@@ -39,7 +39,7 @@ public class BedBlockCompatibilityHandler implements NBTCompatibilityHandler {
         try {
             tempFacing = BlockTypes.RED_BED.getProperty("facing");
             tempPart = BlockTypes.RED_BED.getProperty("part");
-        } catch (NullPointerException | IllegalArgumentException | ClassCastException _) {
+        } catch (NullPointerException | IllegalArgumentException | ClassCastException ignored) {
             tempFacing = null;
             tempPart = null;
         }

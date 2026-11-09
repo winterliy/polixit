@@ -54,7 +54,7 @@ public class WorldEditManifest {
         Kind kind;
         try {
             kind = Kind.valueOf(readAttribute(attributes, WORLD_EDIT_KIND, () -> "UNKNOWN"));
-        } catch (IllegalArgumentException _) {
+        } catch (IllegalArgumentException ignored) {
             kind = Kind.UNKNOWN;
         }
         return new WorldEditManifest(

@@ -31,7 +31,7 @@ public record IntegerProperty(String name, List<Integer> values) implements Prop
                 throw new IllegalArgumentException("Invalid int value: " + string + ". Must be in " + values());
             }
             return val;
-        } catch (NumberFormatException _) {
+        } catch (NumberFormatException ignored) {
             throw new IllegalArgumentException("Invalid int value: " + string + ". Not an int.");
         }
     }

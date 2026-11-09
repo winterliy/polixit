@@ -73,7 +73,7 @@ public class StyleSerializer implements JsonDeserializer<Style>, JsonSerializer<
         try {
             tmp = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.USER_COMMANDS)
                     .getDataVersion() < Constants.DATA_VERSION_MC_1_21_5;
-        } catch (Exception _) {
+        } catch (Exception ignored) {
             // If we can't determine the data version, assume newest.
         }
         PRE_1215 = tmp;

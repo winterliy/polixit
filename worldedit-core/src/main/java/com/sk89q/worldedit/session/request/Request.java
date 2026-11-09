@@ -31,7 +31,8 @@ import javax.annotation.Nullable;
  */
 public final class Request {
 
-    private static final ScopedValue<Request> CURRENT_REQUEST = ScopedValue.newInstance();
+    // ScopedValue is a preview API before Java 25, so releases built for Java 21 use a ThreadLocal.
+    private static final ThreadLocal<Request> CURRENT_REQUEST = new ThreadLocal<>();
 
     private @Nullable World world;
     private @Nullable LocalSession session;
@@ -101,7 +102,11 @@ public final class Request {
      * @return the current request
      */
     public static Request request() {
-        return CURRENT_REQUEST.get();
+        Request current = CURRENT_REQUEST.get();
+        if (current == null) {
+            throw new java.util.NoSuchElementException();
+        }
+        return current;
     }
 
     /**
@@ -111,7 +116,7 @@ public final class Request {
      * @param func the function to apply to the current request
      */
     public static void applyIfPresent(Consumer<Request> func) {
-        if (CURRENT_REQUEST.isBound()) {
+        if (CURRENT_REQUEST.get() != null) {
             func.accept(request());
         }
     }
@@ -125,7 +130,17 @@ public final class Request {
         Request request = new Request();
         request.valid = true;
         try {
-            ScopedValue.where(CURRENT_REQUEST, request).run(runnable);
+            Request previous = CURRENT_REQUEST.get();
+            CURRENT_REQUEST.set(request);
+            try {
+                runnable.run();
+            } finally {
+                if (previous == null) {
+                    CURRENT_REQUEST.remove();
+                } else {
+                    CURRENT_REQUEST.set(previous);
+                }
+            }
         } finally {
             request.invalidate();
         }

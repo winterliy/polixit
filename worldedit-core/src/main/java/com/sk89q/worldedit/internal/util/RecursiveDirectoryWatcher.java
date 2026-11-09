@@ -176,7 +176,7 @@ public class RecursiveDirectoryWatcher implements Closeable {
                 while (!Thread.interrupted()) {
                     try {
                         watchKey = watchService.take();
-                    } catch (InterruptedException _) {
+                    } catch (InterruptedException ignored) {
                         break;
                     }
 
@@ -234,7 +234,7 @@ public class RecursiveDirectoryWatcher implements Closeable {
                         }
                     }
                 }
-            } catch (ClosedWatchServiceException _) {
+            } catch (ClosedWatchServiceException ignored) {
                 // Watch service closed, exit
             }
             LOGGER.debug("RecursiveDirectoryWatcher::EventConsumer exited");

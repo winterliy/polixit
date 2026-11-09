@@ -42,7 +42,7 @@ public class SlotTable {
     }
 
     public Optional<LocalSlot.Variable> initVariable(String name) {
-        slots.computeIfAbsent(name, _ -> new LocalSlot.Variable(0));
+        slots.computeIfAbsent(name, ignored -> new LocalSlot.Variable(0));
         return getVariable(name);
     }
 

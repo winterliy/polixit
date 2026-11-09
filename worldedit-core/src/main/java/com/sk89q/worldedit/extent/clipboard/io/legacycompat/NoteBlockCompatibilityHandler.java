@@ -32,7 +32,7 @@ public class NoteBlockCompatibilityHandler implements NBTCompatibilityHandler {
         IntegerProperty temp;
         try {
             temp = (IntegerProperty) (Property<?>) BlockTypes.NOTE_BLOCK.getProperty("note");
-        } catch (NullPointerException | IllegalArgumentException | ClassCastException _) {
+        } catch (NullPointerException | IllegalArgumentException | ClassCastException ignored) {
             temp = null;
         }
         NOTE_PROPERTY = temp;

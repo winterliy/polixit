@@ -88,7 +88,7 @@ public class CommandLoggingHandler implements CommandCallListener, AutoCloseable
                 return;
             }
             world = worldOpt.get();
-        } catch (CommandException _) {
+        } catch (CommandException ignored) {
             return;
         }
 
@@ -111,7 +111,7 @@ public class CommandLoggingHandler implements CommandCallListener, AutoCloseable
                 case PLACEMENT:
                     try {
                         position = session.getPlacementPosition(actor).toVector3();
-                    } catch (IncompleteRegionException _) {
+                    } catch (IncompleteRegionException ignored) {
                         break;
                     }
                     /* FALL-THROUGH */
@@ -132,7 +132,7 @@ public class CommandLoggingHandler implements CommandCallListener, AutoCloseable
                     try {
                         builder.append(" - Region: ")
                             .append(session.getSelection(world));
-                    } catch (IncompleteRegionException _) {
+                    } catch (IncompleteRegionException ignored) {
                         break;
                     }
                     break;

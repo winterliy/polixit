@@ -147,7 +147,7 @@ public class McRegionReader implements Closeable {
         byte[] data = new byte[length - 1];
         try {
             dataStream.readFully(data);
-        } catch (EOFException _) {
+        } catch (EOFException ignored) {
             throw new DataException("MCRegion file does not contain "
                 + x + "," + z + " in full");
         }

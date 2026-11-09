@@ -94,7 +94,7 @@ public class Snapshot implements Comparable<Snapshot> {
                 }
 
                 return chunkStore;
-            } catch (NoClassDefFoundError _) {
+            } catch (NoClassDefFoundError ignored) {
                 ChunkStore chunkStore = new ZippedMcRegionChunkStore(file);
 
                 if (!chunkStore.isValid()) {
@@ -114,7 +114,7 @@ public class Snapshot implements Comparable<Snapshot> {
                 }
 
                 return chunkStore;
-            } catch (NoClassDefFoundError _) {
+            } catch (NoClassDefFoundError ignored) {
                 throw new DataException("TrueZIP is required for .tar support");
             }
         } else {
@@ -148,17 +148,17 @@ public class Snapshot implements Comparable<Snapshot> {
                     de.schlichtherle.util.zip.ZipFile entry = new de.schlichtherle.util.zip.ZipFile(file);
 
                     return entry.getEntry(worldname) != null;
-                } catch (NoClassDefFoundError _) {
+                } catch (NoClassDefFoundError ignored) {
                     throw new DataException("TrueZIP is required for .tar support");
                 }
             } else {
                 return file.getName().equalsIgnoreCase(worldname);
             }
-        } catch (IOException _) {
+        } catch (IOException ignored) {
             // Skip the file, but print an error
             LOGGER.info("Could not load snapshot: "
                     + file.getPath());
-        } catch (DataException _) {
+        } catch (DataException ignored) {
             // No truezip, so tar file not supported.
             // Dont print, just skip the file.
         }

@@ -229,7 +229,7 @@ public class PermissionsResolverManager implements PermissionsResolver {
                 Class<?> next = null;
                 try {
                     next = Class.forName(getClass().getPackage().getName() + "." + nextName);
-                } catch (ClassNotFoundException _) {
+                } catch (ClassNotFoundException ignored) {
                     // It's okay, we'll just log below
                 }
 

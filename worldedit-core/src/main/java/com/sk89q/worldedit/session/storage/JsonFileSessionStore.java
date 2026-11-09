@@ -108,7 +108,7 @@ public class JsonFileSessionStore implements SessionStore {
             return session;
         } catch (JsonParseException e) {
             throw new IOException(e);
-        } catch (NoSuchFileException _) {
+        } catch (NoSuchFileException ignored) {
             return new LocalSession();
         }
     }

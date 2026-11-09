@@ -89,7 +89,7 @@ public class AreaPickaxe implements BlockTool {
                         }
                     }
                 }
-            } catch (MaxChangedBlocksException _) {
+            } catch (MaxChangedBlocksException ignored) {
                 player.printError(TranslatableComponent.of("worldedit.tool.max-block-changes"));
             } finally {
                 session.remember(editSession);

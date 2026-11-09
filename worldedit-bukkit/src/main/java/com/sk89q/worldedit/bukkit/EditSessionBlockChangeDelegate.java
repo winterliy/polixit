@@ -40,7 +40,7 @@ public class EditSessionBlockChangeDelegate implements BlockChangeDelegate {
     public boolean setBlockData(int x, int y, int z, BlockData blockData) {
         try {
             editSession.setBlock(BlockVector3.at(x, y, z), BukkitAdapter.adapt(blockData));
-        } catch (MaxChangedBlocksException _) {
+        } catch (MaxChangedBlocksException ignored) {
             return false;
         }
         return true;

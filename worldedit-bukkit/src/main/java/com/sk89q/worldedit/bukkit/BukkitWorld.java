@@ -228,7 +228,7 @@ public class BukkitWorld extends AbstractWorld {
         if (adapter != null) {
             try {
                 return adapter.clearContainerBlockContents(getWorld(), pt);
-            } catch (Exception _) {
+            } catch (Exception ignored) {
                 // It's fine if we can't, we'll try the generic way below.
             }
         }
@@ -269,7 +269,7 @@ public class BukkitWorld extends AbstractWorld {
             try {
                 TreeType bukkitType = TreeType.valueOf(type.name());
                 treeTypeMapping.put(type, bukkitType);
-            } catch (IllegalArgumentException _) {
+            } catch (IllegalArgumentException ignored) {
                 // Unhandled TreeType
             }
         }
@@ -314,7 +314,7 @@ public class BukkitWorld extends AbstractWorld {
                 }
                 try {
                     editSession.setBlock(blockVector, BukkitAdapter.adapt(block.getBlockData()));
-                } catch (MaxChangedBlocksException _) {
+                } catch (MaxChangedBlocksException ignored) {
                     // It's fine, we just stop generating.
                 }
                 return false;
