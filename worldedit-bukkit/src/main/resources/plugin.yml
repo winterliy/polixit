@@ -2,7 +2,7 @@ name: Polixit
 main: com.sk89q.worldedit.bukkit.WorldEditPlugin
 version: "${internalVersion}"
 load: STARTUP
-api-version: '26.3'
+api-version: '26.2'
 folia-supported: true
 softdepend: [Vault]
 libraries:

@@ -77,8 +77,8 @@ dependencies {
     "implementation"(libs.bstats.bukkit)
     "implementation"(libs.fastutil)
 
-    // Polixit targets GLAP1/Paper 26.3 only; do not ship or reobfuscate legacy adapters.
-    "adaptersScope"(project(":worldedit-bukkit:adapters:adapter-26.3"))
+    // Polixit targets GLAP1/Paper 26.2 only; do not ship or reobfuscate legacy adapters.
+    "adaptersScope"(project(":worldedit-bukkit:adapters:adapter-26.2"))
 }
 
 tasks.named<Copy>("processResources") {
