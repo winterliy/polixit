@@ -91,7 +91,6 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -99,8 +98,7 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.dimension.LevelStem;
-import net.minecraft.world.level.levelgen.densityfunction.SamplerContext;
-import net.minecraft.world.level.levelgen.feature.Feature;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.Structure;
@@ -492,7 +490,7 @@ public final class CoreMcWorld extends AbstractWorld {
     @Override
     public boolean generateFeature(ConfiguredFeatureType type, EditSession editSession, BlockVector3 position) {
         ServerLevel world = getWorld();
-        Feature feature = world.registryAccess().lookupOrThrow(Registries.FEATURE).getValue(Identifier.tryParse(type.id()));
+        ConfiguredFeature<?, ?> feature = world.registryAccess().lookupOrThrow(Registries.CONFIGURED_FEATURE).getValue(Identifier.tryParse(type.id()));
         ServerChunkCache chunkManager = world.getChunkSource();
         try (CoreMcServerLevelDelegateProxy.LevelAndProxy proxyLevel = CoreMcServerLevelDelegateProxy.newInstance(platform, editSession, world)) {
             return feature != null && feature.place(
@@ -514,16 +512,13 @@ public final class CoreMcWorld extends AbstractWorld {
         }
 
         ServerChunkCache chunkManager = world.getChunkSource();
-        Climate.Sampler climateSampler = chunkManager.randomState().createClimateSampler(
-            SamplerContext.builder().enableCaches().build()
-        );
         try (CoreMcServerLevelDelegateProxy.LevelAndProxy proxyLevel = CoreMcServerLevelDelegateProxy.newInstance(platform, editSession, world)) {
             ChunkPos chunkPos = ChunkPos.containing(new BlockPos(position.x(), position.y(), position.z()));
             StructureStart structureStart = structure.generate(
                 structureRegistry.wrapAsHolder(structure), world.dimension(), world.registryAccess(),
-                chunkManager.getGenerator(), chunkManager.getGenerator().getBiomeSource(), climateSampler, chunkManager.randomState(),
-                world.getStructureTemplateManager(), world.getSeed(), chunkPos, 0, proxyLevel.level(),
-                _ -> true
+                chunkManager.getGenerator(), chunkManager.getGenerator().getBiomeSource(), chunkManager.randomState(),
+                world.getStructureManager(), world.getSeed(), chunkPos, 0, proxyLevel.level(),
+                biome -> true
             );
 
             if (!structureStart.isValid()) {
@@ -720,7 +715,7 @@ public final class CoreMcWorld extends AbstractWorld {
     public Entity createEntity(Location location, BaseEntity entity) {
         ServerLevel world = getWorld();
         String entityId = entity.getType().id();
-        final Optional<EntityType<?>> entityType = world.registryAccess().lookupOrThrow(Registries.ENTITY_TYPE).getOptional(Identifier.parse(entityId));
+        final Optional<EntityType<?>> entityType = EntityType.byString(entityId);
         if (entityType.isEmpty()) {
             return null;
         }
@@ -734,7 +729,7 @@ public final class CoreMcWorld extends AbstractWorld {
         }
         tag.putString("id", entityId);
 
-        net.minecraft.world.entity.Entity createdEntity = EntityType.loadEntityRecursive(entityType.get(), tag, world, EntitySpawnReason.COMMAND, loadedEntity -> {
+        net.minecraft.world.entity.Entity createdEntity = EntityType.loadEntityRecursive(tag, world, EntitySpawnReason.COMMAND, (loadedEntity) -> {
             loadedEntity.absSnapTo(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
             return loadedEntity;
         });
