@@ -76,6 +76,16 @@ public interface Platform extends Keyed {
     DataFixer getDataFixer();
 
     /**
+     * Get optional terrain generation support.
+     *
+     * @return the service, or null when the platform does not support it
+     */
+    @Nullable
+    default TerrainService getTerrainService() {
+        return null;
+    }
+
+    /**
      * Checks if a mob type is valid.
      *
      * @param type The mob type name to check

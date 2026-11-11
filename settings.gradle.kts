@@ -71,17 +71,18 @@ includeBuild("build-logic")
 
 include("worldedit-libs")
 
-listOf("1.20.2", "1.20.4", "1.20.6", "1.21", "1.21.3", "1.21.4").forEach {
+// Polixit for Minecraft 1.20.6 ships only the 1.20.6 adapter.
+listOf("1.20.6").forEach {
     include("worldedit-bukkit:adapters:adapter-$it")
 }
 
-listOf("bukkit", "core", "fabric", "neoforge", "sponge", "cli").forEach {
+listOf("bukkit", "core", "cli").forEach {
     include("worldedit-libs:$it")
     include("worldedit-$it")
 }
-include("worldedit-mod")
+// include("worldedit-mod") // the combined mod jar needs the mod platforms
 include("worldedit-libs:core:ap")
 
 include("worldedit-core:doctools")
 
-include("verification")
+// include("verification") // API-compatibility checks need every platform module

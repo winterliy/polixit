@@ -59,6 +59,8 @@ import com.sk89q.worldedit.command.SnapshotCommandsRegistration;
 import com.sk89q.worldedit.command.SnapshotUtilCommands;
 import com.sk89q.worldedit.command.SnapshotUtilCommandsRegistration;
 import com.sk89q.worldedit.command.SuperPickaxeCommands;
+import com.sk89q.worldedit.command.TerrainCommands;
+import com.sk89q.worldedit.command.TerrainCommandsRegistration;
 import com.sk89q.worldedit.command.SuperPickaxeCommandsRegistration;
 import com.sk89q.worldedit.command.ToolCommands;
 import com.sk89q.worldedit.command.ToolUtilCommands;
@@ -357,6 +359,13 @@ public final class PlatformCommandManager {
             "WorldEdit commands",
             WorldEditCommandsRegistration.builder(),
             new WorldEditCommands(worldEdit)
+        );
+        registerSubCommands(
+            "terrain",
+            ImmutableList.of("/terrain"),
+            "Terrain generation commands",
+            TerrainCommandsRegistration.builder(),
+            new TerrainCommands(worldEdit)
         );
         this.registration.register(
             commandManager,

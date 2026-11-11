@@ -24,6 +24,7 @@ import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Locatable;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
+import com.sk89q.worldedit.history.changeset.ChangeSet;
 import com.sk89q.worldedit.util.eventbus.EventBus;
 import com.sk89q.worldedit.world.World;
 
@@ -39,6 +40,7 @@ public final class EditSessionBuilder {
     private int maxBlocks = -1;
     private @Nullable Actor actor;
     private @Nullable BlockBag blockBag;
+    private @Nullable ChangeSet changeSet;
     private boolean tracing;
 
     EditSessionBuilder(EventBus eventBus) {
@@ -106,6 +108,17 @@ public final class EditSessionBuilder {
     }
 
     /**
+     * Set the change history implementation for the {@link EditSession}.
+     *
+     * @param changeSet the change history implementation
+     * @return this builder
+     */
+    public EditSessionBuilder changeSet(ChangeSet changeSet) {
+        this.changeSet = Preconditions.checkNotNull(changeSet);
+        return this;
+    }
+
+    /**
      * Check if tracing is enabled.
      *
      * <em>Internal use only.</em>
@@ -138,8 +151,8 @@ public final class EditSessionBuilder {
      */
     public EditSession build() {
         if (WorldEdit.getInstance().getConfiguration().traceUnflushedSessions) {
-            return new TracedEditSession(eventBus, world, maxBlocks, blockBag, actor, tracing);
+            return new TracedEditSession(eventBus, world, maxBlocks, blockBag, actor, tracing, changeSet);
         }
-        return new EditSession(eventBus, world, maxBlocks, blockBag, actor, tracing);
+        return new EditSession(eventBus, world, maxBlocks, blockBag, actor, tracing, changeSet);
     }
 }

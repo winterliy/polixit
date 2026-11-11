@@ -197,7 +197,7 @@ public class EditSession implements Extent, AutoCloseable {
     @SuppressWarnings("ProtectedField")
     protected final World world;
     private final @Nullable Actor actor;
-    private final ChangeSet changeSet = new BlockOptimizedHistory();
+    private final ChangeSet changeSet;
 
     private @Nullable SideEffectExtent sideEffectExtent;
     private final SurvivalModeExtent survivalExtent;
@@ -234,7 +234,7 @@ public class EditSession implements Extent, AutoCloseable {
      */
     EditSession(EventBus eventBus, World world, int maxBlocks, @Nullable BlockBag blockBag,
                 @Nullable Actor actor,
-                boolean tracing) {
+                boolean tracing, @Nullable ChangeSet changeSet) {
         checkNotNull(eventBus);
         checkArgument(maxBlocks >= -1, "maxBlocks >= -1 required");
 
@@ -247,6 +247,7 @@ public class EditSession implements Extent, AutoCloseable {
 
         this.world = world;
         this.actor = actor;
+        this.changeSet = changeSet == null ? new BlockOptimizedHistory() : changeSet;
 
         if (world != null) {
             EditSessionEvent event = new EditSessionEvent(world, actor, maxBlocks, null);
@@ -287,7 +288,7 @@ public class EditSession implements Extent, AutoCloseable {
             this.bypassHistory = traceIfNeeded(new DataValidatorExtent(extent, world));
 
             // These extents can be skipped by calling smartSetBlock()
-            extent = traceIfNeeded(changeSetExtent = new ChangeSetExtent(extent, changeSet));
+            extent = traceIfNeeded(changeSetExtent = new ChangeSetExtent(extent, this.changeSet));
             extent = traceIfNeeded(maskingExtent = new MaskingExtent(extent, Masks.alwaysTrue()));
             extent = traceIfNeeded(changeLimiter = new BlockChangeLimiter(extent, maxBlocks));
             extent = wrapExtent(extent, eventBus, event, Stage.BEFORE_HISTORY);

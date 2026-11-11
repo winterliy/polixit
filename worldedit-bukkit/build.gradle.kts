@@ -1,9 +1,17 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import io.papermc.paperweight.userdev.attribute.Obfuscation
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     `java-library`
     id("buildlogic.platform")
+    kotlin("jvm") version "2.4.20"
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_21
+    }
 }
 
 platform {
@@ -72,6 +80,7 @@ tasks.named<Copy>("processResources") {
 }
 
 tasks.named<ShadowJar>("shadowJar") {
+    archiveBaseName.set("polixit")
     configurations.add(adapters)
     dependencies {
         // In tandem with not bundling log4j, we shouldn't relocate base package here.

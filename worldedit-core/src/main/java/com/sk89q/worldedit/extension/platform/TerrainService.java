@@ -1,0 +1,51 @@
+/*
+ * WorldEdit, a Minecraft world manipulation toolkit
+ * Copyright (C) sk89q <http://www.sk89q.com>
+ * Copyright (C) WorldEdit team and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package com.sk89q.worldedit.extension.platform;
+
+import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.regions.Region;
+
+import javax.annotation.Nullable;
+
+/** Platform service for generating terrain inside a WorldEdit selection. */
+public interface TerrainService {
+
+    /**
+     * Start terrain generation for the selected region.
+     *
+     * @param actor the actor requesting generation
+     * @param session the actor's WorldEdit session
+     * @param region the selected region
+     * @param level optional fixed surface Y; null uses the selection corner heights
+     */
+    void generate(Actor actor, LocalSession session, Region region, @Nullable Integer level);
+
+    /** Display terrain analysis for a WorldEdit selection. */
+    void showInfo(Actor actor, Region region);
+
+    /**
+     * Show or update the actor's terrain-generation options.
+     *
+     * @param actor the actor requesting the change
+     * @param setting option name, or null to display all options
+     * @param value new value, or null to restore the configured default
+     */
+    void configure(Actor actor, @Nullable String setting, @Nullable String value);
+}

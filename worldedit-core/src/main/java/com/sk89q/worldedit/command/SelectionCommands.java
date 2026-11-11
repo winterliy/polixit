@@ -114,6 +114,18 @@ public class SelectionCommands {
         return null;
     }
 
+    @Nullable
+    private BlockVector3 getPosition(Actor actor, @Nullable Integer x, @Nullable Integer y, @Nullable Integer z) {
+        if (x == null && y == null && z == null) {
+            return getLocatablePosition(actor);
+        }
+        if (x == null || y == null || z == null) {
+            actor.printError(TextComponent.of("Provide all three coordinates: x y z."));
+            return null;
+        }
+        return BlockVector3.at(x, y, z);
+    }
+
     @Command(
         name = "/pos",
         desc = "Set positions"
@@ -172,13 +184,12 @@ public class SelectionCommands {
     @Logging(POSITION)
     @CommandPermissions("worldedit.selection.pos")
     public void pos1(Actor actor, World world, LocalSession session,
-                     @Arg(desc = "Coordinates to set position 1 to", def = "")
-                         BlockVector3 coordinates) {
+                     @Arg(name = "x", desc = "X coordinate", def = "") @Nullable Integer x,
+                     @Arg(name = "y", desc = "Y coordinate", def = "") @Nullable Integer y,
+                     @Arg(name = "z", desc = "Z coordinate", def = "") @Nullable Integer z) {
+        BlockVector3 coordinates = getPosition(actor, x, y, z);
         if (coordinates == null) {
-            coordinates = getLocatablePosition(actor);
-            if (coordinates == null) {
-                return;
-            }
+            return;
         }
 
         if (!session.getRegionSelector(world).selectPrimary(coordinates, ActorSelectorLimits.forActor(actor))) {
@@ -196,13 +207,12 @@ public class SelectionCommands {
     @Logging(POSITION)
     @CommandPermissions("worldedit.selection.pos")
     public void pos2(Actor actor, World world, LocalSession session,
-                     @Arg(desc = "Coordinates to set position 2 to", def = "")
-                         BlockVector3 coordinates) {
+                     @Arg(name = "x", desc = "X coordinate", def = "") @Nullable Integer x,
+                     @Arg(name = "y", desc = "Y coordinate", def = "") @Nullable Integer y,
+                     @Arg(name = "z", desc = "Z coordinate", def = "") @Nullable Integer z) {
+        BlockVector3 coordinates = getPosition(actor, x, y, z);
         if (coordinates == null) {
-            coordinates = getLocatablePosition(actor);
-            if (coordinates == null) {
-                return;
-            }
+            return;
         }
 
         if (!session.getRegionSelector(world).selectSecondary(coordinates, ActorSelectorLimits.forActor(actor))) {
