@@ -73,9 +73,9 @@ object SurfaceScanner {
     private val NON_TERRAIN = setOf(
         Material.MUSHROOM_STEM, Material.BROWN_MUSHROOM_BLOCK, Material.RED_MUSHROOM_BLOCK,
         Material.BAMBOO, Material.CACTUS, Material.PUMPKIN, Material.MELON,
-        Material.BEE_NEST, Material.MANGROVE_ROOTS, Material.MUDDY_MANGROVE_ROOTS,
+        Material.BEE_NEST,
         Material.POINTED_DRIPSTONE, Material.CHORUS_PLANT, Material.CHORUS_FLOWER,
-    )
+    ) + listOfNotNull(Material.matchMaterial("MANGROVE_ROOTS"), Material.matchMaterial("MUDDY_MANGROVE_ROOTS"))
     // Frozen water counts as water: it's a lid on a lake, not ground to copy.
     private val LIQUID = setOf(
         Material.WATER, Material.LAVA, Material.BUBBLE_COLUMN,

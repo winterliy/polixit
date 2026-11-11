@@ -72,7 +72,7 @@ class Vegetation(private val seed: Long) {
         const val PATCHINESS = 0.9
 
         val SOIL = setOf(Material.GRASS_BLOCK, Material.PODZOL, Material.DIRT, Material.COARSE_DIRT, Material.MOSS_BLOCK)
-        val SAND = setOf(Material.SAND, Material.RED_SAND, Material.TERRACOTTA) + Tag.TERRACOTTA.values
+        val SAND = setOf(Material.SAND, Material.RED_SAND, Material.TERRACOTTA) + Material.values().filter { it.name.endsWith("TERRACOTTA") && !it.name.contains("GLAZED") }
         val MYCELIUM = setOf(Material.MYCELIUM)
 
         fun single(m: Material): (Long) -> List<BlockData> {

@@ -16,8 +16,8 @@ rootProject.name = "worldedit"
 
 include("worldedit-libs")
 
-// Polixit for Minecraft 1.19.4 ships only the 1.19.4 adapter.
-listOf("1.19.4").forEach {
+// Polixit for Minecraft 1.18.2 ships only the 1.18.2 adapter.
+listOf("1.18.2").forEach {
     include("worldedit-bukkit:adapters:adapter-$it")
 }
 
