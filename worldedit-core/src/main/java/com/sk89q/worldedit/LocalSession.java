@@ -37,6 +37,7 @@ import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Locatable;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.history.changeset.ChangeSet;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
 import com.sk89q.worldedit.internal.cui.CUIRegion;
 import com.sk89q.worldedit.internal.cui.SelectionShapeEvent;
@@ -1027,6 +1028,17 @@ public class LocalSession {
      * @return an edit session
      */
     public EditSession createEditSession(Actor actor) {
+        return createEditSession(actor, null);
+    }
+
+    /**
+     * Construct a new edit session with a custom history implementation.
+     *
+     * @param actor the actor
+     * @param changeSet the history implementation, or null for the default
+     * @return an edit session
+     */
+    public EditSession createEditSession(Actor actor, @Nullable ChangeSet changeSet) {
         checkNotNull(actor);
 
         World world = null;
@@ -1042,6 +1054,9 @@ public class LocalSession {
             .actor(actor)
             .maxBlocks(getBlockChangeLimit())
             .tracing(isTracingActions());
+        if (changeSet != null) {
+            builder.changeSet(changeSet);
+        }
         if (actor.isPlayer() && actor instanceof Player) {
             builder.blockBag(getBlockBag((Player) actor));
         }

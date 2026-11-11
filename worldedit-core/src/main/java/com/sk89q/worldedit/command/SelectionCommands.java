@@ -67,6 +67,7 @@ import com.sk89q.worldedit.util.formatting.component.SubtleFormat;
 import com.sk89q.worldedit.util.formatting.component.TextComponentProducer;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import javax.annotation.Nullable;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
@@ -112,8 +113,14 @@ public class SelectionCommands {
     @Logging(POSITION)
     @CommandPermissions("worldedit.selection.pos")
     public void pos1(Actor actor, World world, LocalSession session,
-                     @Arg(desc = "Coordinates to set position 1 to", def = "")
-                         BlockVector3 coordinates) throws WorldEditException {
+                     @Arg(name = "x", desc = "X coordinate", def = "") @Nullable Integer x,
+                     @Arg(name = "y", desc = "Y coordinate", def = "") @Nullable Integer y,
+                     @Arg(name = "z", desc = "Z coordinate", def = "") @Nullable Integer z) throws WorldEditException {
+        if ((x == null) != (y == null) || (y == null) != (z == null)) {
+            actor.printError(TextComponent.of("Provide all three coordinates: x y z."));
+            return;
+        }
+        BlockVector3 coordinates = x == null ? null : BlockVector3.at(x, y, z);
         Location pos;
         if (coordinates != null) {
             pos = new Location(world, coordinates.toVector3());
@@ -140,8 +147,14 @@ public class SelectionCommands {
     @Logging(POSITION)
     @CommandPermissions("worldedit.selection.pos")
     public void pos2(Actor actor, World world, LocalSession session,
-                     @Arg(desc = "Coordinates to set position 2 to", def = "")
-                         BlockVector3 coordinates) throws WorldEditException {
+                     @Arg(name = "x", desc = "X coordinate", def = "") @Nullable Integer x,
+                     @Arg(name = "y", desc = "Y coordinate", def = "") @Nullable Integer y,
+                     @Arg(name = "z", desc = "Z coordinate", def = "") @Nullable Integer z) throws WorldEditException {
+        if ((x == null) != (y == null) || (y == null) != (z == null)) {
+            actor.printError(TextComponent.of("Provide all three coordinates: x y z."));
+            return;
+        }
+        BlockVector3 coordinates = x == null ? null : BlockVector3.at(x, y, z);
         Location pos;
         if (coordinates != null) {
             pos = new Location(world, coordinates.toVector3());

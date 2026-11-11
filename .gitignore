@@ -21,3 +21,7 @@ run
 # i18n
 worldedit-core/src/main/resources/lang/*
 !worldedit-core/src/main/resources/lang/strings.json
+
+# documentation kept locally only
+*.md
+README*

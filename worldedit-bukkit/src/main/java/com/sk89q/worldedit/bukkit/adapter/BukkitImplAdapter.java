@@ -286,4 +286,19 @@ public interface BukkitImplAdapter {
     default void initializeRegistries() {
 
     }
+
+    /**
+     * Sample the vanilla generator's terrain without changing the loaded world.
+     *
+     * @param world the world whose generator should be sampled
+     * @param originX minimum X coordinate
+     * @param originZ minimum Z coordinate
+     * @param width number of columns in X
+     * @param depth number of columns in Z
+     * @return sampled columns, or null when this adapter cannot provide them
+     */
+    @Nullable
+    default com.sk89q.worldedit.bukkit.terrain.VanillaColumns sampleVanillaTerrain(World world, int originX, int originZ, int width, int depth) {
+        return null;
+    }
 }

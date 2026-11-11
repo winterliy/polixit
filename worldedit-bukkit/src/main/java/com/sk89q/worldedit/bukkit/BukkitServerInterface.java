@@ -25,6 +25,7 @@ import com.sk89q.bukkit.util.CommandRegistration;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
+import com.sk89q.worldedit.bukkit.terrain.BukkitTerrainService;
 import com.sk89q.worldedit.command.util.PermissionCondition;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.AbstractPlatform;
@@ -33,6 +34,7 @@ import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.MultiUserPlatform;
 import com.sk89q.worldedit.extension.platform.Preference;
 import com.sk89q.worldedit.extension.platform.Watchdog;
+import com.sk89q.worldedit.extension.platform.TerrainService;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.lifecycle.Lifecycled;
 import com.sk89q.worldedit.world.DataFixer;
@@ -62,12 +64,14 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
     public final WorldEditPlugin plugin;
     private final CommandRegistration dynamicCommands;
     private final Lifecycled<Watchdog> watchdog;
+    private final TerrainService terrainService;
     private boolean hookingEvents;
 
     public BukkitServerInterface(WorldEditPlugin plugin, Server server) {
         this.plugin = plugin;
         this.server = server;
         this.dynamicCommands = new CommandRegistration(plugin);
+        this.terrainService = new BukkitTerrainService(plugin);
         this.watchdog = plugin.getLifecycledBukkitImplAdapter()
             .filter(BukkitImplAdapter::supportsWatchdog)
             .map(BukkitWatchdog::new);
@@ -84,6 +88,11 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
     @Override
     public Registries getRegistries() {
         return BukkitRegistries.getInstance();
+    }
+
+    @Override
+    public TerrainService getTerrainService() {
+        return terrainService;
     }
 
     @SuppressWarnings("deprecation")

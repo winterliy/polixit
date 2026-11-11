@@ -3,9 +3,16 @@ import io.papermc.paperweight.userdev.attribute.Obfuscation
 
 plugins {
     `java-library`
+    kotlin("jvm") version "2.4.20"
 }
 
-applyPlatformAndCoreConfiguration()
+kotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+    }
+}
+
+applyPlatformAndCoreConfiguration(javaRelease = 17)
 applyShadowConfiguration()
 
 repositories {
@@ -78,6 +85,7 @@ tasks.named<Copy>("processResources") {
 addJarManifest(WorldEditKind.Plugin, includeClasspath = true)
 
 tasks.named<ShadowJar>("shadowJar") {
+    archiveBaseName.set("polixit")
     dependsOn(project.project(":worldedit-bukkit:adapters").subprojects.map { it.tasks.named("assemble") })
     from(Callable {
         adapters.resolve()

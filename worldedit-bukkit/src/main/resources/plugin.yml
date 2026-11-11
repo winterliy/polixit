@@ -1,8 +1,10 @@
-name: WorldEdit
+name: Polixit
 main: com.sk89q.worldedit.bukkit.WorldEditPlugin
 version: "${internalVersion}"
 load: STARTUP
-api-version: 1.13
+api-version: '1.19'
 softdepend: [Vault]
-author: EngineHub
-website: https://enginehub.org/worldedit
+libraries:
+  - org.jetbrains.kotlin:kotlin-stdlib:2.4.20
+author: EngineHub, winterliy
+website: https://github.com/winterliy/polixit

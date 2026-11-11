@@ -1,0 +1,19 @@
+# Max selection columns that can be planned by one terrain generation job.
+max-columns: 262144
+# Extra columns sampled outside the transition band to analyze local terrain.
+analysis-margin: 8
+# Maximum depth for filling air, water, vegetation, and buried trees below new ground.
+max-fill-depth: 64
+# Default transition band width outside the selected region.
+defaults:
+  distance: 10
+  round: 0
+  rough: auto
+scale: 48
+vanilla-terrain: true
+copy-plants: true
+max-step: 1
+beach-width: 5
+fill-ores: true
+# Maximum blocks to apply per server tick.
+blocks-per-tick: 20000
