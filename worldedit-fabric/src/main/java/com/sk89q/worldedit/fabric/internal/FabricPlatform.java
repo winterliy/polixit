@@ -38,7 +38,7 @@ class FabricPlatform extends CoreMcPlatform {
     private static Lifecycled<MinecraftServer> createMinecraftServerLifecycled() {
         SimpleLifecycled<MinecraftServer> lifecycledServer = SimpleLifecycled.invalid();
         ServerLifecycleEvents.SERVER_STARTING.register(lifecycledServer::newValue);
-        ServerLifecycleEvents.SERVER_STOPPING.register(_ -> lifecycledServer.invalidate());
+        ServerLifecycleEvents.SERVER_STOPPING.register(ignored -> lifecycledServer.invalidate());
         return lifecycledServer;
     }
 

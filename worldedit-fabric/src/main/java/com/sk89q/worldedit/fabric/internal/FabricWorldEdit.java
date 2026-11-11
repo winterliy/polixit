@@ -83,28 +83,28 @@ public class FabricWorldEdit extends CoreMcMod implements ModInitializer {
             ThreadSafeCache.getInstance().onEndTick(server);
             ((FabricPlatform) PLATFORM).getTerrainServiceImpl().tick(server);
         });
-        CommandRegistrationCallback.EVENT.register((dispatcher, _, _) -> registerCommands(dispatcher));
-        ServerLifecycleEvents.SERVER_STARTING.register(_ -> serverAboutToStart());
+        CommandRegistrationCallback.EVENT.register((dispatcher, ignored, ignored2) -> registerCommands(dispatcher));
+        ServerLifecycleEvents.SERVER_STARTING.register(ignored -> serverAboutToStart());
         ServerLifecycleEvents.SERVER_STARTED.register(this::serverStarted);
-        ServerLifecycleEvents.SERVER_STOPPING.register(_ -> {
+        ServerLifecycleEvents.SERVER_STOPPING.register(ignored -> {
             ((FabricPlatform) PLATFORM).getTerrainServiceImpl().shutdown();
             serverStopping();
         });
-        ServerPlayConnectionEvents.DISCONNECT.register((handler, _) -> {
+        ServerPlayConnectionEvents.DISCONNECT.register((handler, ignored) -> {
             ((FabricPlatform) PLATFORM).getTerrainServiceImpl().onPlayerDisconnect(handler.player);
             onPlayerDisconnect(handler.player);
         });
         AttackBlockCallback.EVENT.register(
-            (playerEntity, _, hand, blockPos, direction) ->
+            (playerEntity, ignored, hand, blockPos, direction) ->
                 onLeftClickBlock(playerEntity, hand, blockPos, direction)
                     ? InteractionResult.SUCCESS : InteractionResult.PASS
         );
         UseBlockCallback.EVENT.register(
-            (playerEntity, _, hand, blockHitResult) ->
+            (playerEntity, ignored, hand, blockHitResult) ->
                 onRightClickBlock(playerEntity, hand, blockHitResult.getBlockPos(), blockHitResult.getDirection())
                     ? InteractionResult.SUCCESS : InteractionResult.PASS
         );
-        UseItemCallback.EVENT.register((playerEntity, _, hand) -> {
+        UseItemCallback.EVENT.register((playerEntity, ignored, hand) -> {
             Optional<Boolean> result = onRightClickItem(playerEntity, hand);
             if (result.isPresent()) {
                 return result.get() ? InteractionResult.SUCCESS : InteractionResult.PASS;
@@ -134,13 +134,13 @@ public class FabricWorldEdit extends CoreMcMod implements ModInitializer {
             }
 
             provider = new LuckoFabricPermissionsProvider(provider);
-        } catch (ClassNotFoundException _) {
+        } catch (ClassNotFoundException ignored) {
             // fallback to vanilla
         } catch (Exception e) {
             // catch any exception to prevent crashing the server, but still print a warning
             LOGGER.warn("Failed to load Fabric permissions provider. Falling back to Minecraft", e);
         }
 
-        return new FabricPermissionsProvider(provider);
+        return provider;
     }
 }

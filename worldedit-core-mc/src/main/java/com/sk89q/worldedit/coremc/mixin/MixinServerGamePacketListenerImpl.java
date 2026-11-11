@@ -27,10 +27,9 @@ import com.sk89q.worldedit.util.lifecycle.ConstantLifecycled;
 import com.sk89q.worldedit.util.lifecycle.Lifecycled;
 import com.sk89q.worldedit.util.lifecycle.SimpleLifecycled;
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
-import net.minecraft.network.protocol.game.ServerboundPunchPacket;
+import net.minecraft.network.protocol.game.ServerboundSwingPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
-import net.minecraft.world.InteractionHand;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -60,16 +59,16 @@ public class MixinServerGamePacketListenerImpl {
 
     @Keep
     @Inject(
-        method = "handlePunch",
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;swing(Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/item/component/SwingAnimation;Z)Z")
+        method = "handleAnimate",
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;swing(Lnet/minecraft/world/InteractionHand;)V")
     )
-    private void handlePunch(@SuppressWarnings("UnusedVariable") ServerboundPunchPacket packet, @SuppressWarnings("UnusedVariable") CallbackInfo ci) {
+    private void onAnimate(ServerboundSwingPacket packet, @SuppressWarnings("UnusedVariable") CallbackInfo ci) {
         if (!((AccessorServerPlayerGameMode) this.player.gameMode).isDestroyingBlock()) {
             if (this.ignoreSwingPackets > 0) {
                 this.ignoreSwingPackets--;
             } else {
                 WORLD_EDITING_PLATFORM.value().ifPresent(platform ->
-                    platform.getMod().onLeftClickAir(this.player, InteractionHand.MAIN_HAND)
+                    platform.getMod().onLeftClickAir(this.player, packet.getHand())
                 );
             }
         }
@@ -81,8 +80,10 @@ public class MixinServerGamePacketListenerImpl {
         at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;resetLastActionTime()V")
     )
     private void onAction(ServerboundPlayerActionPacket packet, @SuppressWarnings("UnusedVariable") CallbackInfo ci) {
-        if (packet.getAction() == ServerboundPlayerActionPacket.Action.START_DESTROY_BLOCK) {
-            this.ignoreSwingPackets++;
+        switch (packet.getAction()) {
+            case DROP_ITEM, DROP_ALL_ITEMS, START_DESTROY_BLOCK -> this.ignoreSwingPackets++;
+            default -> {
+            }
         }
     }
 }

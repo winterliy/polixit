@@ -91,7 +91,6 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -99,13 +98,11 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.dimension.LevelStem;
-import net.minecraft.world.level.levelgen.densityfunction.SamplerContext;
-import net.minecraft.world.level.levelgen.feature.Feature;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
-import net.minecraft.world.level.saveddata.WeatherData;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.ServerLevelData;
 import net.minecraft.world.level.storage.TagValueOutput;
@@ -185,7 +182,7 @@ public final class CoreMcWorld extends AbstractWorld {
 
     @Override
     public String id() {
-        return getName() + "_" + getDimensionRegistryKey(getWorld());
+        return getName() + "ignored" + getDimensionRegistryKey(getWorld());
     }
 
     @Override
@@ -263,7 +260,7 @@ public final class CoreMcWorld extends AbstractWorld {
         final CoreMcFakePlayer fakePlayer;
         try {
             fakePlayer = fakePlayers.get(world);
-        } catch (ExecutionException _) {
+        } catch (ExecutionException ignored) {
             return false;
         }
         fakePlayer.setItemInHand(InteractionHand.MAIN_HAND, stack);
@@ -343,7 +340,8 @@ public final class CoreMcWorld extends AbstractWorld {
                 // No spawners are needed for this world.
                 ImmutableList.of(),
                 // This controls ticking, we don't need it so set it to false.
-                false
+                false,
+                originalWorld.getRandomSequences()
             )) {
                 regenForWorld(region, extent, serverWorld, options);
 
@@ -381,7 +379,7 @@ public final class CoreMcWorld extends AbstractWorld {
 
         for (BlockVector3 vec : region) {
             BlockPos pos = platform.getAdapter().toBlockPos(vec);
-            ChunkAccess chunk = chunks.get(ChunkPos.containing(pos));
+            ChunkAccess chunk = chunks.get(new ChunkPos(pos));
             BlockStateHolder<?> state = platform.getAdapter().fromNativeBlockState(chunk.getBlockState(pos));
             BlockEntity blockEntity = chunk.getBlockEntity(pos);
             if (blockEntity != null) {
@@ -492,7 +490,7 @@ public final class CoreMcWorld extends AbstractWorld {
     @Override
     public boolean generateFeature(ConfiguredFeatureType type, EditSession editSession, BlockVector3 position) {
         ServerLevel world = getWorld();
-        Feature feature = world.registryAccess().lookupOrThrow(Registries.FEATURE).getValue(Identifier.tryParse(type.id()));
+        ConfiguredFeature<?, ?> feature = world.registryAccess().lookupOrThrow(Registries.CONFIGURED_FEATURE).getValue(Identifier.tryParse(type.id()));
         ServerChunkCache chunkManager = world.getChunkSource();
         try (CoreMcServerLevelDelegateProxy.LevelAndProxy proxyLevel = CoreMcServerLevelDelegateProxy.newInstance(platform, editSession, world)) {
             return feature != null && feature.place(
@@ -514,16 +512,13 @@ public final class CoreMcWorld extends AbstractWorld {
         }
 
         ServerChunkCache chunkManager = world.getChunkSource();
-        Climate.Sampler climateSampler = chunkManager.randomState().createClimateSampler(
-            SamplerContext.builder().enableCaches().build()
-        );
         try (CoreMcServerLevelDelegateProxy.LevelAndProxy proxyLevel = CoreMcServerLevelDelegateProxy.newInstance(platform, editSession, world)) {
-            ChunkPos chunkPos = ChunkPos.containing(new BlockPos(position.x(), position.y(), position.z()));
+            ChunkPos chunkPos = new ChunkPos(new BlockPos(position.x(), position.y(), position.z()));
             StructureStart structureStart = structure.generate(
                 structureRegistry.wrapAsHolder(structure), world.dimension(), world.registryAccess(),
-                chunkManager.getGenerator(), chunkManager.getGenerator().getBiomeSource(), climateSampler, chunkManager.randomState(),
-                world.getStructureTemplateManager(), world.getSeed(), chunkPos, 0, proxyLevel.level(),
-                _ -> true
+                chunkManager.getGenerator(), chunkManager.getGenerator().getBiomeSource(), chunkManager.randomState(),
+                world.getStructureManager(), world.getSeed(), chunkPos, 0, proxyLevel.level(),
+                biome -> true
             );
 
             if (!structureStart.isValid()) {
@@ -583,7 +578,7 @@ public final class CoreMcWorld extends AbstractWorld {
 
     @Override
     public WeatherType getWeather() {
-        WeatherData weatherData = getWorld().getServer().getWeatherData();
+        ServerLevelData weatherData = (ServerLevelData) getWorld().getLevelData();
         if (weatherData.isThundering()) {
             return WeatherTypes.THUNDER_STORM;
         }
@@ -595,7 +590,7 @@ public final class CoreMcWorld extends AbstractWorld {
 
     @Override
     public long getRemainingWeatherDuration() {
-        WeatherData weatherData = getWorld().getServer().getWeatherData();
+        ServerLevelData weatherData = (ServerLevelData) getWorld().getLevelData();
         if (weatherData.isThundering()) {
             return weatherData.getThunderTime();
         }
@@ -612,7 +607,7 @@ public final class CoreMcWorld extends AbstractWorld {
 
     @Override
     public void setWeather(WeatherType weatherType, long duration) {
-        WeatherData weatherData = getWorld().getServer().getWeatherData();
+        ServerLevelData weatherData = (ServerLevelData) getWorld().getLevelData();
         if (weatherType == WeatherTypes.THUNDER_STORM) {
             weatherData.setClearWeatherTime(0);
             weatherData.setThundering(true);
@@ -720,7 +715,7 @@ public final class CoreMcWorld extends AbstractWorld {
     public Entity createEntity(Location location, BaseEntity entity) {
         ServerLevel world = getWorld();
         String entityId = entity.getType().id();
-        final Optional<EntityType<?>> entityType = world.registryAccess().lookupOrThrow(Registries.ENTITY_TYPE).getOptional(Identifier.parse(entityId));
+        final Optional<EntityType<?>> entityType = EntityType.byString(entityId);
         if (entityType.isEmpty()) {
             return null;
         }
@@ -734,7 +729,7 @@ public final class CoreMcWorld extends AbstractWorld {
         }
         tag.putString("id", entityId);
 
-        net.minecraft.world.entity.Entity createdEntity = EntityType.loadEntityRecursive(entityType.get(), tag, world, EntitySpawnReason.COMMAND, loadedEntity -> {
+        net.minecraft.world.entity.Entity createdEntity = EntityType.loadEntityRecursive(tag, world, EntitySpawnReason.COMMAND, (loadedEntity) -> {
             loadedEntity.absSnapTo(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
             return loadedEntity;
         });

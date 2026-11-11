@@ -96,7 +96,7 @@ public final class CoreMcCommandWrapper {
         return ctx -> {
             InjectedValueStore store = MapBackedValueStore.create();
             final Actor actor = platform.getAdapter().adaptCommandSource(ctx);
-            store.injectValue(Key.of(Actor.class), _ -> Optional.of(actor));
+            store.injectValue(Key.of(Actor.class), ignored -> Optional.of(actor));
             return mapping.getCondition().satisfied(store);
         };
     }
