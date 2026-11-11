@@ -8,11 +8,11 @@ plugins {
 
 kotlin {
     compilerOptions {
-        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_16)
     }
 }
 
-applyPlatformAndCoreConfiguration(javaRelease = 17)
+applyPlatformAndCoreConfiguration(javaRelease = 16)
 applyShadowConfiguration()
 
 repositories {

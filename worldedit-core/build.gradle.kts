@@ -6,7 +6,7 @@ plugins {
     antlr
 }
 
-applyPlatformAndCoreConfiguration(javaRelease = 17)
+applyPlatformAndCoreConfiguration(javaRelease = 16)
 
 repositories {
     ivy {

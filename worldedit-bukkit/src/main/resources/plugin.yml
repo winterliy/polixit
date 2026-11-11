@@ -2,7 +2,7 @@ name: Polixit
 main: com.sk89q.worldedit.bukkit.WorldEditPlugin
 version: "${internalVersion}"
 load: STARTUP
-api-version: '1.18'
+api-version: '1.17'
 softdepend: [Vault]
 libraries:
   - org.jetbrains.kotlin:kotlin-stdlib:2.4.20
