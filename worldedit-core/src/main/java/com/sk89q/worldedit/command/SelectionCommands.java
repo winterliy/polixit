@@ -76,10 +76,10 @@ public class SelectionCommands {
 
     @Command(
         aliases = { "/pos1" },
-        usage = "[coordinates]",
+        usage = "[x,y,z | x y z]",
         desc = "Set position 1",
         min = 0,
-        max = 1
+        max = 3
     )
     @Logging(POSITION)
     @CommandPermissions("worldedit.selection.pos")
@@ -87,7 +87,17 @@ public class SelectionCommands {
 
         Vector pos;
 
-        if (args.argsLength() == 1) {
+        if (args.argsLength() == 3) {
+            try {
+                pos = new Vector(Integer.parseInt(args.getString(0)), Integer.parseInt(args.getString(1)), Integer.parseInt(args.getString(2)));
+            } catch (NumberFormatException e) {
+                player.printError("Provide all three coordinates: x y z.");
+                return;
+            }
+        } else if (args.argsLength() == 2) {
+            player.printError("Provide all three coordinates: x y z.");
+            return;
+        } else if (args.argsLength() == 1) {
             if (args.getString(0).matches("-?\\d+,-?\\d+,-?\\d+")) {
                 String[] coords = args.getString(0).split(",");
                 pos = new Vector(Integer.parseInt(coords[0]), Integer.parseInt(coords[1]), Integer.parseInt(coords[2]));
@@ -110,17 +120,27 @@ public class SelectionCommands {
 
     @Command(
         aliases = { "/pos2" },
-        usage = "[coordinates]",
+        usage = "[x,y,z | x y z]",
         desc = "Set position 2",
         min = 0,
-        max = 1
+        max = 3
     )
     @Logging(POSITION)
     @CommandPermissions("worldedit.selection.pos")
     public void pos2(Player player, LocalSession session, EditSession editSession, CommandContext args) throws WorldEditException {
 
         Vector pos;
-        if (args.argsLength() == 1) {
+        if (args.argsLength() == 3) {
+            try {
+                pos = new Vector(Integer.parseInt(args.getString(0)), Integer.parseInt(args.getString(1)), Integer.parseInt(args.getString(2)));
+            } catch (NumberFormatException e) {
+                player.printError("Provide all three coordinates: x y z.");
+                return;
+            }
+        } else if (args.argsLength() == 2) {
+            player.printError("Provide all three coordinates: x y z.");
+            return;
+        } else if (args.argsLength() == 1) {
             if (args.getString(0).matches("-?\\d+,-?\\d+,-?\\d+")) {
                 String[] coords = args.getString(0).split(",");
                 pos = new Vector(Integer.parseInt(coords[0]),

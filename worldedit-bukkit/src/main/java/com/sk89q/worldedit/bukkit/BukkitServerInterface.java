@@ -185,4 +185,14 @@ public class BukkitServerInterface extends ServerInterface implements MultiUserP
         }
         return users;
     }
+
+    private com.sk89q.worldedit.extension.platform.TerrainService terrainService;
+
+    @Override
+    public synchronized com.sk89q.worldedit.extension.platform.TerrainService getTerrainService() {
+        if (terrainService == null) {
+            terrainService = new com.sk89q.worldedit.bukkit.terrain.BukkitTerrainService(plugin);
+        }
+        return terrainService;
+    }
 }

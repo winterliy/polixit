@@ -1,0 +1,172 @@
+/*
+ * WorldEdit, a Minecraft world manipulation toolkit
+ * Copyright (C) sk89q <http://www.sk89q.com>
+ * Copyright (C) WorldEdit team and contributors
+ * Copyright (C) 2026 jaehyun <ano701.main@gmail.com> (Motopoly-derived terrain code)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package com.sk89q.worldedit.bukkit.terrain
+
+import org.bukkit.ChunkSnapshot
+import org.bukkit.Material
+import org.bukkit.World
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.Executor
+import java.util.UUID
+
+/**
+ * Surface heights over a region plus [margin] columns on each side, read from
+ * chunk snapshots so the heavy part can run off the main thread.
+ */
+class SurfaceGrid(
+    val world: World,
+    val originX: Int,
+    val originZ: Int,
+    val width: Int,
+    val depth: Int,
+    val margin: Int,
+    val minHeight: Int,
+    val maxHeight: Int,
+    val worldId: UUID,
+    /** Y of the topmost terrain block (trees, plants and water skipped). */
+    val heights: IntArray,
+    /** Like [heights], but stops at the water surface: what a newcomer's ground should meet. */
+    val surface: IntArray,
+    /** Y of the topmost non-air block of any kind: buildings, trees, water. */
+    val skyHeights: IntArray,
+    private val snapshots: Map<Long, ChunkSnapshot>,
+) {
+    fun index(x: Int, z: Int) = (z - originZ) * width + (x - originX)
+
+    fun snapshot(x: Int, z: Int): ChunkSnapshot = snapshots.getValue(SurfaceScanner.chunkKey(x shr 4, z shr 4))
+
+    fun blockData(x: Int, y: Int, z: Int): BlockData = snapshot(x, z).blockAt(x and 15, y, z and 15)
+
+    fun type(x: Int, y: Int, z: Int): Material = snapshot(x, z).typeAt(x and 15, y, z and 15)
+
+    /** Heights of the selection only, without the margin. */
+    fun innerHeights(): IntArray {
+        val w = width - 2 * margin
+        val d = depth - 2 * margin
+        val out = IntArray(w * d)
+        for (z in 0 until d) System.arraycopy(heights, (z + margin) * width + margin, out, z * w, w)
+        return out
+    }
+}
+
+object SurfaceScanner {
+    private val NON_TERRAIN = listOf(
+        "HUGE_MUSHROOM_1", "HUGE_MUSHROOM_2", "CACTUS", "PUMPKIN", "MELON_BLOCK", "CHORUS_PLANT", "CHORUS_FLOWER",
+    ).mapNotNull { Material.matchMaterial(it) }.toSet()
+    // Frozen water counts as water: it's a lid on a lake, not ground to copy.
+    private val LIQUID: Set<Material> = LegacyCompat.WATER + LegacyCompat.LAVA +
+        listOf("ICE", "FROSTED_ICE").mapNotNull { Material.matchMaterial(it) }
+
+    /** Ground the generator should treat as the land surface. */
+    fun isTerrain(type: Material) =
+        type.isSolid && type !in NON_TERRAIN && type !in LIQUID && type !in LegacyCompat.LOGS && type !in LegacyCompat.LEAVES
+
+    fun isLiquid(type: Material) = type in LIQUID
+
+    fun chunkKey(cx: Int, cz: Int) = (cx.toLong() shl 32) or (cz.toLong() and 0xffffffffL)
+
+    /**
+     * Loads the chunks (async on Paper), snapshots them on the main thread and
+     * builds the grid on [async].
+     */
+    fun scan(
+        world: World, selectionMinX: Int, selectionMinZ: Int,
+        selectionMaxX: Int, selectionMaxZ: Int, margin: Int, async: Executor,
+    ): CompletableFuture<SurfaceGrid> {
+        require(margin >= 0) { "margin must be non-negative" }
+        require(selectionMinX <= selectionMaxX && selectionMinZ <= selectionMaxZ) { "selection bounds are invalid" }
+        val minX = selectionMinX - margin
+        val minZ = selectionMinZ - margin
+        val maxX = selectionMaxX + margin
+        val maxZ = selectionMaxZ + margin
+        val minHeight = LegacyCompat.minHeight(world)
+        val maxHeight = world.maxHeight
+        val worldId = world.uid
+
+        val futures = ArrayList<CompletableFuture<ChunkSnapshot>>()
+        for (cx in (minX shr 4)..(maxX shr 4)) {
+            for (cz in (minZ shr 4)..(maxZ shr 4)) {
+                // Called on the main thread: load and snapshot synchronously (no async chunk API before 1.13).
+                futures += CompletableFuture.completedFuture(world.getChunkAt(cx, cz).getChunkSnapshot(true, false, false))
+            }
+        }
+
+        return CompletableFuture.allOf(*futures.toTypedArray()).thenApplyAsync({
+            val snapshots = futures.associate { f -> f.join().let { chunkKey(it.x, it.z) to it } }
+            build(world, minX, minZ, maxX, maxZ, margin, minHeight, maxHeight, worldId, snapshots)
+        }, async)
+    }
+
+    private fun build(
+        world: World, minX: Int, minZ: Int, maxX: Int, maxZ: Int, margin: Int,
+        minHeight: Int, maxHeight: Int, worldId: UUID,
+        snapshots: Map<Long, ChunkSnapshot>,
+    ): SurfaceGrid {
+        val width = maxX - minX + 1
+        val depth = maxZ - minZ + 1
+        val heights = IntArray(width * depth)
+        val surface = IntArray(width * depth)
+        val sky = IntArray(width * depth)
+        val floor = minHeight
+
+        for (z in minZ..maxZ) {
+            for (x in minX..maxX) {
+                val snap = snapshots.getValue(chunkKey(x shr 4, z shr 4))
+                val lx = x and 15
+                val lz = z and 15
+                val top = topNonAir(snap, lx, lz, minHeight, maxHeight)
+                var y = top
+                var water = Int.MIN_VALUE
+                while (y > floor) {
+                    val type = snap.typeAt(lx, y, lz)
+                    if (isTerrain(type)) break
+                    if (isLiquid(type)) {
+                        if (water == Int.MIN_VALUE) water = y
+                    } else if (water != Int.MIN_VALUE) {
+                        // Out through the bottom of the water into a cave or ravine: the water's floor is the ground here.
+                        break
+                    }
+                    y--
+                }
+                val i = (z - minZ) * width + (x - minX)
+                heights[i] = y
+                surface[i] = maxOf(y, water)
+                sky[i] = maxOf(top, y)
+            }
+        }
+        return SurfaceGrid(
+            world, minX, minZ, width, depth, margin, minHeight, maxHeight, worldId,
+            heights, surface, sky, snapshots,
+        )
+    }
+
+    /** Highest non-air block in a column, skipping empty sections; the heightmap misses torches, glass panes and the like. */
+    private fun topNonAir(snap: ChunkSnapshot, lx: Int, lz: Int, minHeight: Int, maxHeight: Int): Int {
+        val minSection = minHeight shr 4
+        for (section in ((maxHeight - 1) shr 4) downTo minSection) {
+            if (snap.isSectionEmpty(section - minSection)) continue
+            for (y in (section shl 4) + 15 downTo (section shl 4)) {
+                if (!LegacyCompat.isAir(snap.typeAt(lx, y, lz))) return y
+            }
+        }
+        return minHeight
+    }
+}

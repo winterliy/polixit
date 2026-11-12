@@ -150,4 +150,14 @@ public interface Platform {
      */
     Map<Capability, Preference> getCapabilities();
 
+
+    /**
+     * Polixit terrain generation for this platform.
+     *
+     * @return the terrain service, or null when the platform has none
+     */
+    @javax.annotation.Nullable
+    default TerrainService getTerrainService() {
+        return null;
+    }
 }

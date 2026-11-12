@@ -249,7 +249,7 @@ public class GenerationCommands {
     }
 
     @Command(
-        aliases = { "/generate", "/gen", "/g" },
+        aliases = { "/generate", "/g" },
         usage = "<block> <expression>",
         desc = "Generates a shape according to a formula.",
         help =

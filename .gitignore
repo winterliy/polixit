@@ -18,3 +18,6 @@ run
 
 /dependency-reduced-pom.xml
 *-private.sh
+# documentation kept locally only
+*.md
+README*

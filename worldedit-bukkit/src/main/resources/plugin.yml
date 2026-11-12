@@ -1,7 +1,9 @@
-name: WorldEdit
+name: Polixit
 main: com.sk89q.worldedit.bukkit.WorldEditPlugin
 version: "${internalVersion}"
 softdepend: [Spout] #hack to fix trove errors
+author: EngineHub, winterliy
+website: https://github.com/winterliy/polixit
 
 # Permissions aren't here. Read http://wiki.sk89q.com/wiki/WEPIF/DinnerPerms
 # for how WorldEdit permissions actually work.
