@@ -30,6 +30,3 @@ worldedit-core/src/main/resources/lang/*
 commands.rst
 permissions.rst
 
-# documentation kept locally only
-*.md
-README*
