@@ -76,6 +76,6 @@ public final class TerrainCommands {
 
     @Nullable
     private static String emptyToNull(@Nullable String value) {
-        return value == null || value.isBlank() ? null : value;
+        return value == null || value.trim().isEmpty() ? null : value;
     }
 }

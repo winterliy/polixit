@@ -8,11 +8,12 @@ plugins {
 
 kotlin {
     compilerOptions {
-        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_16)
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8)
+        freeCompilerArgs.add("-Xjdk-release=1.8")
     }
 }
 
-applyPlatformAndCoreConfiguration(javaRelease = 16)
+applyPlatformAndCoreConfiguration(javaRelease = 8)
 applyShadowConfiguration()
 
 repositories {
@@ -110,6 +111,16 @@ tasks.named<ShadowJar>("shadowJar") {
         relocate("org.bstats", "com.sk89q.worldedit.bstats")
         relocate("io.papermc.lib", "com.sk89q.worldedit.bukkit.paperlib")
         relocate("it.unimi.dsi.fastutil", "com.sk89q.worldedit.bukkit.fastutil")
+        // Minecraft 1.13 - 1.16 ship Guava 21 and an old SnakeYAML; bundle the versions WorldEdit 7.2.20 needs.
+        include(dependency("com.google.guava:guava"))
+        include(dependency("com.google.guava:failureaccess"))
+        include(dependency("org.yaml:snakeyaml"))
+        relocate("com.google.common", "com.sk89q.worldedit.internal.guava")
+        relocate("com.google.thirdparty", "com.sk89q.worldedit.internal.guava.thirdparty")
+        relocate("org.yaml.snakeyaml", "com.sk89q.worldedit.internal.snakeyaml")
+        // plugin.yml "libraries" only exists from 1.16.5, so the Kotlin runtime is bundled too.
+        include(dependency("org.jetbrains.kotlin:kotlin-stdlib"))
+        relocate("kotlin", "com.sk89q.worldedit.internal.kotlin")
     }
 }
 
@@ -121,4 +132,15 @@ configure<PublishingExtension> {
     publications.named<MavenPublication>("maven") {
         from(components["java"])
     }
+}
+
+// Minecraft 1.13.2 - 1.16.5 servers may still run Java 8: Jabel compiles the Java 17 syntax used by
+// Polixit's terrain code to Java 8 bytecode (records carry @Desugar).
+dependencies {
+    "annotationProcessor"("com.pkware.jabel:jabel-javac-plugin:1.0.1-2")
+    "compileOnly"("com.pkware.jabel:jabel-javac-plugin:1.0.1-2")
+}
+tasks.withType<JavaCompile>().matching { it.name == "compileJava" }.configureEach {
+    sourceCompatibility = "17"
+    options.release.set(8)
 }

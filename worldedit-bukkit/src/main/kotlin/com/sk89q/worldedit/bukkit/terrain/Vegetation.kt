@@ -71,7 +71,7 @@ class Vegetation(private val seed: Long) {
         const val CLUMP_SCALE = 9.0
         const val PATCHINESS = 0.9
 
-        val SOIL = setOf(Material.GRASS_BLOCK, Material.PODZOL, Material.DIRT, Material.COARSE_DIRT, Material.MOSS_BLOCK)
+        val SOIL = setOf(Material.GRASS_BLOCK, Material.PODZOL, Material.DIRT, Material.COARSE_DIRT) + listOfNotNull(Material.matchMaterial("MOSS_BLOCK"))
         val SAND = setOf(Material.SAND, Material.RED_SAND, Material.TERRACOTTA) + Material.values().filter { it.name.endsWith("TERRACOTTA") && !it.name.contains("GLAZED") }
         val MYCELIUM = setOf(Material.MYCELIUM)
 
@@ -116,10 +116,10 @@ class Vegetation(private val seed: Long) {
         val largeFern = tall(Material.LARGE_FERN)
         val plainsFlowers = arrayOf(
             single(Material.DANDELION), single(Material.POPPY), single(Material.AZURE_BLUET), single(Material.OXEYE_DAISY),
-            single(Material.CORNFLOWER), single(Material.RED_TULIP), single(Material.ORANGE_TULIP),
+            single(material("CORNFLOWER", "BLUE_ORCHID")), single(Material.RED_TULIP), single(Material.ORANGE_TULIP),
             single(Material.WHITE_TULIP), single(Material.PINK_TULIP),
         )
-        val forestFlowers = arrayOf(single(Material.DANDELION), single(Material.POPPY), single(Material.LILY_OF_THE_VALLEY))
+        val forestFlowers = arrayOf(single(Material.DANDELION), single(Material.POPPY), single(material("LILY_OF_THE_VALLEY", "OXEYE_DAISY")))
         val forestShrubs = arrayOf(tall(Material.LILAC), tall(Material.ROSE_BUSH), tall(Material.PEONY))
         val mushrooms = arrayOf(single(Material.BROWN_MUSHROOM), single(Material.RED_MUSHROOM))
 
@@ -128,7 +128,7 @@ class Vegetation(private val seed: Long) {
         val FOREST = listOf(plant(0.20, grass), plant(0.015, *forestFlowers), plant(0.006, *forestShrubs))
         val BIRCH = listOf(plant(0.18, grass), plant(0.05, bed("WILDFLOWERS", "PINK_PETALS", "DANDELION")), plant(0.01, *forestFlowers))
         val TAIGA = listOf(
-            plant(0.12, grass), plant(0.15, fern), plant(0.03, largeFern), plant(0.004, single(Material.SWEET_BERRY_BUSH)),
+            plant(0.12, grass), plant(0.15, fern), plant(0.03, largeFern), plant(0.004, single(material("SWEET_BERRY_BUSH", "FERN"))),
         )
         val SAVANNA = listOf(plant(0.45, grass), plant(0.10, tallGrass))
         val JUNGLE = listOf(plant(0.35, grass), plant(0.15, fern), plant(0.05, largeFern))
@@ -143,7 +143,7 @@ class Vegetation(private val seed: Long) {
             "minecraft:meadow" to listOf(plant(0.45, grass), plant(0.08, tallGrass), plant(0.06, *plainsFlowers, single(Material.ALLIUM))),
             "minecraft:flower_forest" to listOf(
                 plant(0.10, grass),
-                plant(0.12, *plainsFlowers, single(Material.ALLIUM), single(Material.LILY_OF_THE_VALLEY)),
+                plant(0.12, *plainsFlowers, single(Material.ALLIUM), single(material("LILY_OF_THE_VALLEY", "OXEYE_DAISY"))),
                 plant(0.01, *forestShrubs),
             ),
             "minecraft:forest" to FOREST,

@@ -33,5 +33,6 @@ package com.sk89q.worldedit.terrain;
  * @param vanillaRelief  true when the detail came from vanilla-generated terrain, false for the noise fallback
  */
 @SuppressWarnings("ArrayRecordComponent")
+@com.github.bsideup.jabel.Desugar
 public record GeneratePlan(int[] target, int band, boolean[] zone, double roughness, TerrainStats surroundings, boolean vanillaRelief) {
 }

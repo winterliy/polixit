@@ -39,6 +39,7 @@ package com.sk89q.worldedit.terrain;
  * @param round        how rounded the selection's corners are, 0 (square) to 100 (corner radius
  *                     half the shorter side); the cut-off corners join the transition band
  */
+@com.github.bsideup.jabel.Desugar
 public record GenerateParams(
         int lowY,
         int highY,

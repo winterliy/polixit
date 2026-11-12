@@ -53,20 +53,25 @@ object GenerateJob {
     private val DIRT = Material.DIRT.createBlockData()
     // Surface blocks that only make sense under open sky.
     private val TOPSOIL = setOf(
-        Material.GRASS_BLOCK, Material.PODZOL, Material.MYCELIUM, Material.DIRT_PATH, Material.FARMLAND,
+        Material.GRASS_BLOCK, Material.PODZOL, Material.MYCELIUM, Material.FARMLAND,
+        LegacyCompat.materialOr("DIRT_PATH", "GRASS_PATH"),
     )
     private val STONE_ORES = mapOf(
         OreTable.Ore.COAL to Material.COAL_ORE, OreTable.Ore.IRON to Material.IRON_ORE,
-        OreTable.Ore.COPPER to Material.COPPER_ORE, OreTable.Ore.GOLD to Material.GOLD_ORE,
+        OreTable.Ore.COPPER to LegacyCompat.materialOr("COPPER_ORE", "IRON_ORE"), OreTable.Ore.GOLD to Material.GOLD_ORE,
         OreTable.Ore.REDSTONE to Material.REDSTONE_ORE, OreTable.Ore.LAPIS to Material.LAPIS_ORE,
         OreTable.Ore.DIAMOND to Material.DIAMOND_ORE,
     ).mapValues { it.value.createBlockData() }
     private val DEEPSLATE_ORES = mapOf(
-        OreTable.Ore.COAL to Material.DEEPSLATE_COAL_ORE, OreTable.Ore.IRON to Material.DEEPSLATE_IRON_ORE,
-        OreTable.Ore.COPPER to Material.DEEPSLATE_COPPER_ORE, OreTable.Ore.GOLD to Material.DEEPSLATE_GOLD_ORE,
-        OreTable.Ore.REDSTONE to Material.DEEPSLATE_REDSTONE_ORE, OreTable.Ore.LAPIS to Material.DEEPSLATE_LAPIS_ORE,
-        OreTable.Ore.DIAMOND to Material.DEEPSLATE_DIAMOND_ORE,
+        OreTable.Ore.COAL to LegacyCompat.materialOr("DEEPSLATE_COAL_ORE", "COAL_ORE"),
+        OreTable.Ore.IRON to LegacyCompat.materialOr("DEEPSLATE_IRON_ORE", "IRON_ORE"),
+        OreTable.Ore.COPPER to LegacyCompat.materialOr("DEEPSLATE_COPPER_ORE", "IRON_ORE"),
+        OreTable.Ore.GOLD to LegacyCompat.materialOr("DEEPSLATE_GOLD_ORE", "GOLD_ORE"),
+        OreTable.Ore.REDSTONE to LegacyCompat.materialOr("DEEPSLATE_REDSTONE_ORE", "REDSTONE_ORE"),
+        OreTable.Ore.LAPIS to LegacyCompat.materialOr("DEEPSLATE_LAPIS_ORE", "LAPIS_ORE"),
+        OreTable.Ore.DIAMOND to LegacyCompat.materialOr("DEEPSLATE_DIAMOND_ORE", "DIAMOND_ORE"),
     ).mapValues { it.value.createBlockData() }
+    private val DEEPSLATE: Material? = LegacyCompat.material("DEEPSLATE")
     private val SNOW = Material.SNOW.createBlockData()
     // Snow doesn't settle on these.
     private val NO_SNOW = setOf(Material.ICE, Material.PACKED_ICE, Material.BLUE_ICE)
@@ -221,7 +226,7 @@ object GenerateJob {
     private fun oreIn(rock: BlockData, x: Int, y: Int, z: Int, seed: Long): BlockData {
         val ores = when (rock.material) {
             Material.STONE -> STONE_ORES
-            Material.DEEPSLATE -> DEEPSLATE_ORES
+            DEEPSLATE -> DEEPSLATE_ORES
             else -> return rock
         }
         return OreTable.pick(x, y, z, seed)?.let { ores.getValue(it) } ?: rock
@@ -251,7 +256,7 @@ object GenerateJob {
         val plants = ArrayList<BlockData>(2)
         for (y in surface + 1..minOf(surface + 2, ceiling)) {
             val type = grid.type(x, y, z)
-            if (type.isAir || type.isSolid || SurfaceScanner.isLiquid(type)) break
+            if (LegacyCompat.isAir(type) || type.isSolid || SurfaceScanner.isLiquid(type)) break
             plants += grid.blockData(x, y, z)
         }
         return plants

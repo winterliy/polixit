@@ -43,6 +43,7 @@ public final class OreTable {
      * @param peak     Y with the highest density; density falls linearly to the band ends.
      *                 {@code Integer.MIN_VALUE} for a flat band
      */
+    @com.github.bsideup.jabel.Desugar
     private record Band(Ore ore, int minY, int maxY, int peak, double perBlock) {
         double density(int y) {
             if (y < minY || y > maxY) return 0;

@@ -72,10 +72,10 @@ class SurfaceGrid(
 object SurfaceScanner {
     private val NON_TERRAIN = setOf(
         Material.MUSHROOM_STEM, Material.BROWN_MUSHROOM_BLOCK, Material.RED_MUSHROOM_BLOCK,
-        Material.BAMBOO, Material.CACTUS, Material.PUMPKIN, Material.MELON,
-        Material.BEE_NEST,
-        Material.POINTED_DRIPSTONE, Material.CHORUS_PLANT, Material.CHORUS_FLOWER,
-    ) + listOfNotNull(Material.matchMaterial("MANGROVE_ROOTS"), Material.matchMaterial("MUDDY_MANGROVE_ROOTS"))
+        Material.CACTUS, Material.PUMPKIN, Material.MELON,
+        
+        Material.CHORUS_PLANT, Material.CHORUS_FLOWER,
+    ) + listOf("MANGROVE_ROOTS", "MUDDY_MANGROVE_ROOTS", "BAMBOO", "BEE_NEST", "POINTED_DRIPSTONE").mapNotNull { Material.matchMaterial(it) }
     // Frozen water counts as water: it's a lid on a lake, not ground to copy.
     private val LIQUID = setOf(
         Material.WATER, Material.LAVA, Material.BUBBLE_COLUMN,
@@ -105,7 +105,7 @@ object SurfaceScanner {
         val minZ = selectionMinZ - margin
         val maxX = selectionMaxX + margin
         val maxZ = selectionMaxZ + margin
-        val minHeight = world.minHeight
+        val minHeight = LegacyCompat.minHeight(world)
         val maxHeight = world.maxHeight
         val worldId = world.uid
 
@@ -172,7 +172,7 @@ object SurfaceScanner {
         for (section in ((maxHeight - 1) shr 4) downTo minSection) {
             if (snap.isSectionEmpty(section - minSection)) continue
             for (y in (section shl 4) + 15 downTo (section shl 4)) {
-                if (!snap.getBlockType(lx, y, lz).isAir) return y
+                if (!LegacyCompat.isAir(snap.getBlockType(lx, y, lz))) return y
             }
         }
         return minHeight

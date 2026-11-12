@@ -6,7 +6,7 @@ plugins {
     antlr
 }
 
-applyPlatformAndCoreConfiguration(javaRelease = 16)
+applyPlatformAndCoreConfiguration(javaRelease = 8)
 
 repositories {
     ivy {
@@ -126,4 +126,15 @@ configure<PublishingExtension> {
         artifactId = the<BasePluginExtension>().archivesName.get()
         from(components["java"])
     }
+}
+
+// Minecraft 1.13.2 - 1.16.5 servers may still run Java 8: Jabel compiles the Java 17 syntax used by
+// Polixit's terrain code to Java 8 bytecode (records carry @Desugar).
+dependencies {
+    "annotationProcessor"("com.pkware.jabel:jabel-javac-plugin:1.0.1-2")
+    "compileOnly"("com.pkware.jabel:jabel-javac-plugin:1.0.1-2")
+}
+tasks.withType<JavaCompile>().matching { it.name == "compileJava" }.configureEach {
+    sourceCompatibility = "17"
+    options.release.set(8)
 }

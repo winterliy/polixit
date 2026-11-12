@@ -28,6 +28,7 @@ import java.util.Arrays;
  * @param roughness mean absolute 4-neighbour Laplacian. Vanilla plains sit
  *                  around 0.2-0.8, hills 1-2, mountains well above 2.
  */
+@com.github.bsideup.jabel.Desugar
 public record TerrainStats(int min, int max, double mean, int median, double stdDev, double roughness) {
 
     /** Statistics over a whole width*depth grid. */

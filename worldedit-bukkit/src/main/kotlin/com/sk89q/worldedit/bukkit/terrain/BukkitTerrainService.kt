@@ -73,7 +73,7 @@ class BukkitTerrainService(private val plugin: WorldEditPlugin) : TerrainService
         val max = region.maximumPoint
         val lowY = level ?: min.y
         val highY = level ?: max.y
-        if (lowY !in world.minHeight until world.maxHeight || highY !in world.minHeight until world.maxHeight) {
+        if (lowY !in LegacyCompat.minHeight(world) until world.maxHeight || highY !in LegacyCompat.minHeight(world) until world.maxHeight) {
             actor.printError(TextComponent.of("The requested surface height is outside this world's build range."))
             return
         }
@@ -94,7 +94,7 @@ class BukkitTerrainService(private val plugin: WorldEditPlugin) : TerrainService
         val gridWidth = width + margin * 2
         val gridDepth = depth + margin * 2
         val seed = world.seed
-        val minHeight = world.minHeight
+        val minHeight = LegacyCompat.minHeight(world)
         val maxHeight = world.maxHeight
         actor.printInfo(TextComponent.of("Analyzing terrain around the selection..."))
 
